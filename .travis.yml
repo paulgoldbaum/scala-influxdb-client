@@ -8,3 +8,4 @@ after_success: "sbt coveralls"
 before_install:
   - wget https://s3.amazonaws.com/influxdb/influxdb_0.9.4.1_amd64.deb
   - sudo dpkg -i influxdb_0.9.4.1_amd64.deb
+  - sudo /etc/init.d/influxdb start
