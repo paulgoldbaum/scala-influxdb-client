@@ -4,14 +4,25 @@ import org.scalatest.FunSuite
 
 class QueryResponseSuite extends FunSuite {
 
-  test("Can be created from a string") {
-    val data = "{\"results\":[{\"series\":[{\"name\":\"databases\",\"columns\":[\"name\"],\"values\":[[\"_internal\"]]}]}]}"
+  val data = "{\"results\":[{\"series\":[{\"name\":\"databases\",\"columns\":[\"name\"],\"values\":[[\"_internal\"]]}]}]}"
+  val queryResponse = QueryResponse.fromJson(data)
 
-    val queryResponse = QueryResponse.fromJson(data)
-    //assert(queryResponse.series(0).values(0) == "_internal")
-    assert(queryResponse.series(0))
+  test("Name is parsed correctly") {
+    assert(queryResponse.series.head.name == "databases")
   }
 
+  test("Columns are parsed correctly") {
+    assert(queryResponse.series.head.columns.length == 1)
+    assert(queryResponse.series.head.columns.head == "name")
+  }
 
+  test("Values are accessible by position") {
+    assert(queryResponse.series.head.values.head(0) == "_internal")
+  }
 
+  /*
+  test("Values are accessible by name") {
+    assert(queryResponse.series.head.values.head("name") == "_internal")
+  }
+  */
 }
