@@ -33,16 +33,26 @@ class QueryResponseSuite extends FunSuite {
   }
 
   test("Construct series") {
-    val data = JsonParser("""{"name":"databases","columns":["name"],"values":[["_internal"]]}""")
+    val data = JsonParser("""{"name":"test_series","columns":["column1", "column2", "column3"],"values":[["value1", 2, true]]}""")
     val series = QueryResponse.constructSeries(data)
 
-    assert(series.name == "databases")
-    assert(series.columns.length == 1)
-    assert(series.columns.head == "name")
+    assert(series.name == "test_series")
+    assert(series.columns == List("column1", "column2", "column3"))
     assert(series.records.length == 1)
-    assert(series.records.head("name") == "_internal")
+
+    val record = series.records.head
+    assert(record("column1") == "value1")
+    assert(record("column2") == 2)
+    assert(record("column3") == true)
   }
 
+  test("Value series can be accessed by name") {
+    val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
+    val series = QueryResponse.constructSeries(data)
+
+    assert(series.points("column1") == List(1, 2, 3, 4))
+    assert(series.points("column2") == List(2, 3, 4, 5))
+  }
   /*
 
   test("Invalid record value types throw exception") {}

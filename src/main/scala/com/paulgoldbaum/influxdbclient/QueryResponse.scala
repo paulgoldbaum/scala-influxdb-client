@@ -7,7 +7,10 @@ class Record(namesIndex: Map[String, Int], values: List[Any]) {
   def apply(name: String) = values(namesIndex(name))
 }
 
-case class Series(name: String, columns: List[String], records: List[Record])
+case class Series(name: String, columns: List[String], records: List[Record]) {
+  def points(column: String) = records.map(_(column))
+  def points(column: Int) = records.map(_(column))
+}
 
 object QueryResponse {
 
