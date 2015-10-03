@@ -1,5 +1,8 @@
 package com.paulgoldbaum.influxdbclient
 
+import com.paulgoldbaum.influxdbclient.WriteParameters.Consistency.Consistency
+import com.paulgoldbaum.influxdbclient.WriteParameters.Precision.Precision
+
 class Database(override val host: String,
                override val port: Int,
                override val username: String,
@@ -15,8 +18,15 @@ class Database(override val host: String,
     queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
   }
 
-  def write(point: Point) = {
-    val params = Map("db" -> databaseName)
+  def write(point: Point, precision: Precision = null, consistency: Consistency = null, retentionPolicy: String = null) = {
+    var params = Map("db" -> databaseName)
+    if (precision != null)
+      params = params + ("precision" -> precision.str)
+    if (consistency != null)
+      params = params + ("consistency" -> consistency.str)
+    if (retentionPolicy != null)
+      params = params + ("retentionPolicy" -> retentionPolicy)
+
     httpClient.post("write", params, point.serialize())
   }
 
