@@ -6,7 +6,7 @@ import spray.json.JsonParser
 class QueryResponseSuite extends FunSuite {
 
   test("Construct response") {
-    val data = "{\"results\":[{\"series\":[{\"name\":\"databases\",\"columns\":[\"name\"],\"values\":[[\"_internal\"]]}]}]}"
+    val data = """{"results":[{"series":[{"name":"databases","columns":["name"],"values":[["_internal"]]}]}]}"""
     val queryResponse = QueryResponse.fromJson(data)
 
     assert(queryResponse.series.length == 1)
@@ -46,4 +46,11 @@ class QueryResponseSuite extends FunSuite {
   /*
   test("Invalid record value types throw exception") {}
   */
+
+  // test errors return error response
+  // {"results":[{"error":"database not found: _test"}]}
+
+  // empty responses handled correctly
+  // {"results":[{}]}
+
 }

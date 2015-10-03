@@ -29,7 +29,7 @@ class PointSuite extends FunSuite {
     assert(StringField("key", "value").serialize == "key=\"value\"")
     assert(DoubleField("key", 12.123).serialize == "key=12.123")
     assert(LongField("key", 12123l).serialize == "key=12123i")
-    assert(BooleanField("key", true).serialize == "key=t")
+    assert(BooleanField("key", value = true).serialize == "key=t")
   }
 
   test("Fields are escaped correctly") {

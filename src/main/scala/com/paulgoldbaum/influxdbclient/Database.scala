@@ -23,7 +23,7 @@ class Database(override val host: String,
   override def query(query: String) = {
     val params = Map("q" -> query, "db" -> databaseName)
     httpClient.get("query", params)
-      .map{response => System.out.println(response.content); QueryResponse.fromJson(response.content)}
+      .map(response => QueryResponse.fromJson(response.content))
   }
 
 }

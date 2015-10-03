@@ -48,6 +48,4 @@ object QueryResponse {
   }
 }
 
-class QueryResponse(val series: List[Series]) {
-
-}
+class QueryResponse(val series: List[Series]) {}
