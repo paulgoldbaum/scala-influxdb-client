@@ -1,33 +1,42 @@
 package com.paulgoldbaum.influxdbclient
 
+import com.ning.http.client.Realm.{AuthScheme, RealmBuilder}
 import com.ning.http.client.{Response, AsyncCompletionHandler, AsyncHttpClient}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 class HttpClient(host: String, port: Int, username: String = null, password: String = null) {
 
   implicit val ec = ExecutionContext.global
+  val client = new AsyncHttpClient()
+  val authenticationRealm = makeAuthenticationRealm()
 
   def get(url: String, params: Map[String, String] = Map()): Future[HttpResponse] = {
-    val client = new AsyncHttpClient()
-    val resultPromise = Promise[HttpResponse]()
     var requestBuilder = client.prepareGet(s"http://$host:$port/$url")
-
-    if (username != null)
-      requestBuilder = requestBuilder.addQueryParam("username", username)
-
-    if (password != null)
-      requestBuilder = requestBuilder.addQueryParam("password", password)
+    if (authenticationRealm != null)
+      requestBuilder = requestBuilder.setRealm(authenticationRealm)
 
     params.foreach(param => requestBuilder = requestBuilder.addQueryParam(param._1, param._2))
 
-    requestBuilder.execute(new AsyncCompletionHandler[Response] {
-      override def onCompleted(response: Response): Response = {
-        resultPromise.success(HttpResponse(response.getStatusCode, response.getResponseBody))
-        response
-      }
-    })
-
+    val resultPromise = Promise[HttpResponse]()
+    requestBuilder.execute(new ResponseHandler(resultPromise))
     resultPromise.future
+  }
+
+  private def makeAuthenticationRealm() = username match {
+    case null => null
+    case _ => new RealmBuilder()
+        .setPrincipal(username)
+        .setPassword(password)
+        .setUsePreemptiveAuth(true)
+        .setScheme(AuthScheme.BASIC)
+        .build()
+  }
+
+  private class ResponseHandler(promise: Promise[HttpResponse]) extends AsyncCompletionHandler[Response] {
+    override def onCompleted(response: Response): Response = {
+      promise.success(HttpResponse(response.getStatusCode, response.getResponseBody))
+      response
+    }
   }
 
   case class HttpResponse(code: Int, content: String)
