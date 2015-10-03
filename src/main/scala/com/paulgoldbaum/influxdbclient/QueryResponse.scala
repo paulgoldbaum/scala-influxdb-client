@@ -7,7 +7,7 @@ class Record(namesIndex: Map[String, Int], values: List[Any]) {
   def apply(name: String) = values(namesIndex(name))
 }
 
-case class Series(name: String, columns: List[String], records: List[Record]) {
+class Series(val name: String, val columns: List[String], val records: List[Record]) {
   def points(column: String) = records.map(_(column))
   def points(column: Int) = records.map(_(column))
 }
@@ -15,18 +15,16 @@ case class Series(name: String, columns: List[String], records: List[Record]) {
 object QueryResponse {
 
   def fromJson(data: String) = {
-    /*
     val root = data.parseJson.asInstanceOf[JsObject]
     val resultsArray = root.fields("results").asInstanceOf[JsArray]
     val resultObject = resultsArray.elements.head.asInstanceOf[JsObject]
     val seriesArray = resultObject.fields("series").asInstanceOf[JsArray]
 
-    val series = seriesArray.elements.map(_.convertTo[Series]).toList
+    val series = seriesArray.elements.map(constructSeries).toList
     new QueryResponse(series)
-    */
   }
 
-  def constructSeries(value: JsValue) = {
+  def constructSeries(value: JsValue): Series = {
     val fields = value.asInstanceOf[JsObject].fields
     val seriesName = fields("name").asInstanceOf[JsString].value
     val columns = fields("columns").asInstanceOf[JsArray].elements.map {
@@ -38,7 +36,7 @@ object QueryResponse {
     new Series(seriesName, columns, records)
   }
 
-  def constructRecord(namesIndex: Map[String, Int], value: JsValue) = {
+  def constructRecord(namesIndex: Map[String, Int], value: JsValue): Record = {
     val valueArray = value.asInstanceOf[JsArray]
     val values = valueArray.elements.map {
       case JsNumber(num) => num

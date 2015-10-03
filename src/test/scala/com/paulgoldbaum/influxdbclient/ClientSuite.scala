@@ -16,7 +16,7 @@ class ClientSuite extends FunSuite with Matchers {
   test("Shows existing databases") {
     val client = new Client("localhost", 8086)
     val result = Await.result(client.showDatabases(), 2.seconds)
-    assert(!result.isEmpty)
+    assert(result.contains("_internal"))
   }
 
 }

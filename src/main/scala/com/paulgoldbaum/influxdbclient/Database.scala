@@ -7,4 +7,12 @@ class Database(override val host: String,
                val databaseName: String) extends Client(host, port, username, password)
 {
 
+  def create() = {
+    query("CREATE DATABASE \"" + databaseName + "\"")
+  }
+
+  def drop() = {
+    query("DROP DATABASE \"" + databaseName + "\"")
+  }
+
 }

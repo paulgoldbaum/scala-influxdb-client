@@ -1,6 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 
 class Client(val host: String, val port: Int, val username: String = null, val password: String = null) {
 
@@ -10,8 +10,10 @@ class Client(val host: String, val port: Int, val username: String = null, val p
   def selectDatabase(databaseName: String) =
     new Database(host, port, username, password, databaseName)
 
-  def showDatabases() = {
-    query("SHOW DATABASES").map(_.content)
+  def showDatabases(): Future[Seq[String]] = {
+    query("SHOW DATABASES")
+      .map(response => QueryResponse.fromJson(response.content))
+      .map(response => response.series.head.points("name").asInstanceOf[List[String]])
   }
 
   def query(query: String) = {
