@@ -11,10 +11,19 @@ class HttpClient(host: String, port: Int, username: String = null, password: Str
   val authenticationRealm = makeAuthenticationRealm()
 
   def get(url: String, params: Map[String, String] = Map()): Future[HttpResponse] = {
-    var requestBuilder = client.prepareGet(s"http://$host:$port/$url")
-    if (authenticationRealm != null)
-      requestBuilder = requestBuilder.setRealm(authenticationRealm)
+    var requestBuilder = client.prepareGet("http://%s:%d/%s".format(host, port, url))
+      .setRealm(authenticationRealm)
+    params.foreach(param => requestBuilder = requestBuilder.addQueryParam(param._1, param._2))
 
+    val resultPromise = Promise[HttpResponse]()
+    requestBuilder.execute(new ResponseHandler(resultPromise))
+    resultPromise.future
+  }
+
+  def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
+    var requestBuilder = client.preparePost("http://%s:%d/%s".format(host, port, url))
+      .setRealm(authenticationRealm)
+      .setBody(content)
     params.foreach(param => requestBuilder = requestBuilder.addQueryParam(param._1, param._2))
 
     val resultPromise = Promise[HttpResponse]()

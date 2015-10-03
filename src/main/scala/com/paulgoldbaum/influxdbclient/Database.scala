@@ -8,11 +8,22 @@ class Database(override val host: String,
 {
 
   def create() = {
-    query("CREATE DATABASE \"" + databaseName + "\"")
+    queryWithoutResult("CREATE DATABASE \"" + databaseName + "\"")
   }
 
   def drop() = {
-    query("DROP DATABASE \"" + databaseName + "\"")
+    queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
+  }
+
+  def write(point: Point) = {
+    val params = Map("db" -> databaseName)
+    httpClient.post("write", params, point.serialize())
+  }
+
+  override def query(query: String) = {
+    val params = Map("q" -> query, "db" -> databaseName)
+    httpClient.get("query", params)
+      .map{response => System.out.println(response.content); QueryResponse.fromJson(response.content)}
   }
 
 }

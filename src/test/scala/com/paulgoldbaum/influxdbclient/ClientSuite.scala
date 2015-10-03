@@ -1,6 +1,5 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.WriteParameters.{Consistency, Precision}
 import org.scalatest.{Matchers, FunSuite}
 
 import scala.concurrent.Await
