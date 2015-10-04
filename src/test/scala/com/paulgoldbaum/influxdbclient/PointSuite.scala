@@ -25,11 +25,20 @@ class PointSuite extends FunSuite {
     assert(Tag("ke=y", "va=lue").serialize == "ke\\=y=va\\=lue")
   }
 
-  test("Fields are serialized correctly") {
+  test("String fields are serialized correctly") {
     assert(StringField("key", "value").serialize == "key=\"value\"")
+  }
+
+  test("Double fields are serialized correctly") {
     assert(DoubleField("key", 12.123).serialize == "key=12.123")
+  }
+
+  test("Long fields are serialized correctly") {
     assert(LongField("key", 12123l).serialize == "key=12123i")
-    assert(BooleanField("key", value = true).serialize == "key=t")
+  }
+
+  test("Boolean fields are serialized correctly") {
+    assert(BooleanField("key", value = true).serialize == "key=true")
   }
 
   test("Fields are escaped correctly") {

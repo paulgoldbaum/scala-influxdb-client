@@ -9,13 +9,13 @@ case class StringField(key: String, value: String) extends Field {
 }
 
 case class DoubleField(key: String, value: Double) extends Field {
-  def serialize = Util.escapeString(key) + "=" + value.toString
+  def serialize = Util.escapeString(key) + "=" + value
 }
 
 case class LongField(key: String, value: Long) extends Field {
-  def serialize = Util.escapeString(key) + "=" + value.toString + "i"
+  def serialize = Util.escapeString(key) + "=" + value + "i"
 }
 
 case class BooleanField(key: String, value: Boolean) extends Field {
-  def serialize = Util.escapeString(key) + "=" + (if(value) "t" else "f")
+  def serialize = Util.escapeString(key) + "=" + value
 }
