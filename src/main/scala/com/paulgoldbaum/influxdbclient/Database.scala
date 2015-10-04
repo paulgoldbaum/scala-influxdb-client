@@ -3,6 +3,8 @@ package com.paulgoldbaum.influxdbclient
 import com.paulgoldbaum.influxdbclient.WriteParameters.Consistency.Consistency
 import com.paulgoldbaum.influxdbclient.WriteParameters.Precision.Precision
 
+import scala.concurrent.Future
+
 class Database(override val host: String,
                override val port: Int,
                override val username: String,
@@ -18,16 +20,29 @@ class Database(override val host: String,
     queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
   }
 
-  def write(point: Point, precision: Precision = null, consistency: Consistency = null, retentionPolicy: String = null) = {
-    var params = Map("db" -> databaseName)
-    if (precision != null)
-      params = params + ("precision" -> precision.str)
-    if (consistency != null)
-      params = params + ("consistency" -> consistency.str)
-    if (retentionPolicy != null)
-      params = params + ("retentionPolicy" -> retentionPolicy)
+  def write(point: Point,
+            precision: Precision = null,
+            consistency: Consistency = null,
+            retentionPolicy: String = null): Future[Boolean] =
+  {
+    val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
     httpClient.post("write", params, point.serialize())
+      .recover { case error => throw new WriteException("Error during write", error) }
+      .map { result =>
+        if (result.code != 204)
+          throw new WriteException("Error during write: " + result.content, null)
+        true
+      }
+  }
+
+  private def buildWriteParameters(databaseName: String,
+                                   precision: Precision = null,
+                                   consistency: Consistency = null,
+                                   retentionPolicy: String = null): Map[String, String] =
+  {
+    val params = List(("db", databaseName), ("precision", precision), ("consistency", consistency), ("rp", retentionPolicy))
+    params.filterNot(_._2 == null).map(r => (r._1, r._2.toString)).toMap
   }
 
   override def query(query: String) = {
@@ -35,5 +50,6 @@ class Database(override val host: String,
     httpClient.get("query", params)
       .map(response => QueryResponse.fromJson(response.content))
   }
-
 }
+
+class WriteException(str: String, throwable: Throwable) extends Exception(str, throwable)

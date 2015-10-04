@@ -3,7 +3,9 @@ package com.paulgoldbaum.influxdbclient
 object WriteParameters {
 
   object Precision {
-    sealed abstract class Precision(val str: String)
+    sealed abstract class Precision(str: String) {
+      override def toString = str
+    }
 
     case object NANOSECONDS extends Precision("n")
     case object MICROSECONDS extends Precision("u")
@@ -14,7 +16,9 @@ object WriteParameters {
   }
 
   object Consistency {
-    sealed abstract class Consistency(val str: String)
+    sealed abstract class Consistency(str: String) {
+      override def toString = str
+    }
 
     case object ONE extends Consistency("one")
     case object QUORUM extends Consistency("quorum")

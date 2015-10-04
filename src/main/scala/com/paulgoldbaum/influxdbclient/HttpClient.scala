@@ -34,20 +34,28 @@ class HttpClient(host: String, port: Int, username: String = null, password: Str
   private def makeAuthenticationRealm() = username match {
     case null => null
     case _ => new RealmBuilder()
-        .setPrincipal(username)
-        .setPassword(password)
-        .setUsePreemptiveAuth(true)
-        .setScheme(AuthScheme.BASIC)
-        .build()
+      .setPrincipal(username)
+      .setPassword(password)
+      .setUsePreemptiveAuth(true)
+      .setScheme(AuthScheme.BASIC)
+      .build()
   }
 
   private class ResponseHandler(promise: Promise[HttpResponse]) extends AsyncCompletionHandler[Response] {
+
     override def onCompleted(response: Response): Response = {
-      promise.success(HttpResponse(response.getStatusCode, response.getResponseBody))
+      if (response.getStatusCode >= 400)
+        promise.failure(new HttpException("Server answered with error code " + response.getStatusCode))
+      else
+        promise.success(HttpResponse(response.getStatusCode, response.getResponseBody))
       response
     }
   }
 
   case class HttpResponse(code: Int, content: String)
+
   case class HttpJsonResponse(code: Int, content: Map[String, Object])
+
+  class HttpException(str: String) extends Exception(str)
+
 }

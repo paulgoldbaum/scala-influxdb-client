@@ -14,15 +14,15 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
 
   test("A database can be created and dropped") {
     val influxdb = InfluxDB.connect()
-    val database = influxdb.selectDatabase("test_database")
+    val database = influxdb.selectDatabase("_test_database")
 
     Await.result(database.create(), waitDuration)
     var databases = Await.result(database.showDatabases(), waitDuration)
-    assert(databases.contains("test_database"))
+    assert(databases.contains("_test_database"))
 
     Await.result(database.drop(), waitDuration)
     databases = Await.result(database.showDatabases(), waitDuration)
-    assert(!databases.contains("test_database"))
+    assert(!databases.contains("_test_database"))
   }
 
   before {
@@ -64,18 +64,34 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("A point can be written with a retention policy parameter") {
-    fail("this test should blow up when using a non-existent retention policy")
     Await.result(
       database.write(Point("test_measurement", 11111111).addField("value", 123),
-        retentionPolicy = "custom_retention_policy"),
+        retentionPolicy = "default"),
       waitDuration)
     val result = Await.result(database.query("SELECT * FROM test_measurement"), waitDuration)
     assert(result.series.length == 1)
+  }
+
+  ignore("Writing to a non-existent retention policy throws an error") {
+    // Makes influxdb explode. https://github.com/influxdb/influxdb/issues/4318
+    try {
+      Await.result(
+        database.write(Point("test_measurement", 11111111).addField("value", 123),
+          retentionPolicy = "fake_retention_policy"),
+        waitDuration)
+      fail("Write using non-existent retention policy did not fail")
+    } catch {
+      case e: WriteException => // expected
+    }
   }
 
   // Write to database that doesn't exist should throw error
 
   // Empty results show throw error
   // {"results":[{}]}
+
+  // error codes 4xx 5xx
+
+  // methods relying on queryWithoutResult (create database, drop database) should return empty ok response
 
 }
