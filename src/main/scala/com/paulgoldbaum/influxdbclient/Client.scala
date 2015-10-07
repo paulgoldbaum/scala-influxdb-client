@@ -16,14 +16,14 @@ class Client(val host: String, val port: Int, val username: String = null, val p
   }
 
   def query(query: String) = {
-    val params = Map("q" -> query)
-    httpClient.get("query", params)
+    httpClient.get("query", getQueryParameters(query))
       .map(response => QueryResponse.fromJson(response.content))
   }
 
   def queryWithoutResult(query: String) = {
-    val params = Map("q" -> query)
-    httpClient.get("query", params)
+    httpClient.get("query", getQueryParameters(query))
   }
+
+  protected def getQueryParameters(query: String) = Map("q" -> query)
 
 }

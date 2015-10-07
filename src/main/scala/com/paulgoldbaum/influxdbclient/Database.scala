@@ -45,10 +45,8 @@ class Database(override val host: String,
     params.filterNot(_._2 == null).map(r => (r._1, r._2.toString)).toMap
   }
 
-  override def query(query: String) = {
-    val params = Map("q" -> query, "db" -> databaseName)
-    httpClient.get("query", params)
-      .map(response => QueryResponse.fromJson(response.content))
+  override protected def getQueryParameters(query: String) = {
+    super.getQueryParameters(query) + ("db" -> databaseName)
   }
 }
 
