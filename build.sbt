@@ -6,8 +6,11 @@ version := "0.1"
 
 scalaVersion := "2.11.7"
 
+testOptions in Test += Tests.Argument("-oDF")
+
 libraryDependencies += "com.ning" % "async-http-client" % "1.9.31"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
-
+libraryDependencies += "io.netty" % "netty" % "3.10.4.Final"
+libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"

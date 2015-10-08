@@ -15,13 +15,14 @@ class Client(val host: String, val port: Int, val username: String = null, val p
       .map(response => response.series.head.points("name").asInstanceOf[List[String]])
   }
 
-  def query(query: String) = {
-    httpClient.get("query", getQueryParameters(query))
+  def query(query: String): Future[QueryResponse] = {
+    httpClient.get("/query", getQueryParameters(query))
       .map(response => QueryResponse.fromJson(response.content))
   }
 
-  def queryWithoutResult(query: String) = {
-    httpClient.get("query", getQueryParameters(query))
+  def queryWithoutResult(query: String): Future[EmptyResponse] = {
+    httpClient.get("/query", getQueryParameters(query))
+      .map(response => new EmptyResponse)
   }
 
   protected def getQueryParameters(query: String) = Map("q" -> query)

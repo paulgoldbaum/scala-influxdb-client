@@ -49,3 +49,5 @@ object QueryResponse {
 }
 
 class QueryResponse(val series: List[Series]) {}
+
+class EmptyResponse()
