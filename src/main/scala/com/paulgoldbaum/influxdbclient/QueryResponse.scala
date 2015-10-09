@@ -2,19 +2,19 @@ package com.paulgoldbaum.influxdbclient
 
 import spray.json._
 
-class Record(namesIndex: Map[String, Int], values: List[Any]) {
+class Record protected[influxdbclient] (namesIndex: Map[String, Int], values: List[Any]) {
   def apply(position: Int) = values(position)
   def apply(name: String) = values(namesIndex(name))
 }
 
-class Series(val name: String, val columns: List[String], val records: List[Record]) {
+class Series protected[influxdbclient] (val name: String, val columns: List[String], val records: List[Record]) {
   def points(column: String) = records.map(_(column))
   def points(column: Int) = records.map(_(column))
 }
 
 object QueryResponse {
 
-  def fromJson(data: String) = {
+  protected[influxdbclient] def fromJson(data: String) = {
     val root = data.parseJson.asInstanceOf[JsObject]
     val resultsArray = root.fields("results").asInstanceOf[JsArray]
     val resultObject = resultsArray.elements.head.asInstanceOf[JsObject]
@@ -24,7 +24,7 @@ object QueryResponse {
     new QueryResponse(series)
   }
 
-  def constructSeries(value: JsValue): Series = {
+  protected[influxdbclient] def constructSeries(value: JsValue): Series = {
     val fields = value.asInstanceOf[JsObject].fields
     val seriesName = fields("name").asInstanceOf[JsString].value
     val columns = fields("columns").asInstanceOf[JsArray].elements.map {
@@ -36,7 +36,7 @@ object QueryResponse {
     new Series(seriesName, columns, records)
   }
 
-  def constructRecord(namesIndex: Map[String, Int], value: JsValue): Record = {
+  protected[influxdbclient] def constructRecord(namesIndex: Map[String, Int], value: JsValue): Record = {
     val valueArray = value.asInstanceOf[JsArray]
     val values = valueArray.elements.map {
       case JsNumber(num) => num
@@ -48,6 +48,6 @@ object QueryResponse {
   }
 }
 
-class QueryResponse(val series: List[Series]) {}
+protected class QueryResponse(val series: List[Series]) {}
 
-class EmptyResponse()
+protected class EmptyResponse()

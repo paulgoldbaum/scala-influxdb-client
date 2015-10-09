@@ -5,7 +5,7 @@ import com.ning.http.client.{AsyncHttpClientConfig, Response, AsyncCompletionHan
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 
-object HttpClient {
+protected object HttpClient {
 
   case class HttpResponse(code: Int, content: String)
 
@@ -33,7 +33,7 @@ object HttpClient {
   }
 }
 
-class HttpClient(host: String,
+protected class HttpClient(host: String,
                  port: Int,
                  username: String = null,
                  password: String = null,

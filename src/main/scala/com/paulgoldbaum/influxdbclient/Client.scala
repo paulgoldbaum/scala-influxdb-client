@@ -2,7 +2,8 @@ package com.paulgoldbaum.influxdbclient
 
 import scala.concurrent.{Future, ExecutionContext}
 
-class Client(val host: String, val port: Int, val username: String = null, val password: String = null) {
+class Client protected[influxdbclient]
+(val host: String, val port: Int, val username: String = null, val password: String = null) {
 
   val httpClient = new HttpClient(host, port, username, password)
   implicit val ec = ExecutionContext.global

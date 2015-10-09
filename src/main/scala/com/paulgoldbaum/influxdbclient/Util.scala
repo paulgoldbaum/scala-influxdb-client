@@ -1,5 +1,5 @@
 package com.paulgoldbaum.influxdbclient
 
-object Util {
+protected object Util {
  def escapeString(str: String) = str.replaceAll("([ ,=])", "\\\\$1")
 }

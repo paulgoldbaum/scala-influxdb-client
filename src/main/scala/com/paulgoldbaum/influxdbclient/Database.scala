@@ -5,7 +5,7 @@ import com.paulgoldbaum.influxdbclient.WriteParameters.Precision.Precision
 
 import scala.concurrent.Future
 
-class Database(override val host: String,
+class Database protected[influxdbclient] (override val host: String,
                override val port: Int,
                override val username: String,
                override val password: String,

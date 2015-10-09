@@ -35,12 +35,14 @@ class QueryResponseSuite extends FunSuite {
     assert(record("column3") == true)
   }
 
-  test("Value series can be accessed by name") {
+  test("Value series can be accessed by name and position") {
     val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
     val series = QueryResponse.constructSeries(data)
 
     assert(series.points("column1") == List(1, 2, 3, 4))
+    assert(series.points(0) == List(1, 2, 3, 4))
     assert(series.points("column2") == List(2, 3, 4, 5))
+    assert(series.points(1) == List(2, 3, 4, 5))
   }
 
   /*

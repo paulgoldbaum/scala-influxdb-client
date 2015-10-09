@@ -67,7 +67,7 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     }
   }
 
-  test("Future fails if response takes too long") {
+  test("Future fails if request takes too long") {
     val url = "/query"
     stubFor(get(urlEqualTo(url))
       .willReturn(
@@ -77,6 +77,27 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
           .withBody("")))
 
     val config = new Config().setRequestTimeout(50)
+    val client = new HttpClient(host, port, null, null, config)
+
+    val future = client.get(url)
+    try {
+      Await.result(future, 5.seconds)
+      fail("Did not throw exception")
+    } catch {
+      case e: HttpException =>
+    }
+  }
+
+  test("Future fails if read takes too long") {
+    val url = "/query"
+    stubFor(get(urlEqualTo(url))
+      .willReturn(
+        aResponse()
+          .withFixedDelay(200)
+          .withStatus(200)
+          .withBody("")))
+
+    val config = new Config().setReadTimeout(50)
     val client = new HttpClient(host, port, null, null, config)
 
     val future = client.get(url)
