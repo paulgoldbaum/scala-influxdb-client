@@ -54,12 +54,17 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     }
   }
 
-  ignore("Future fails if server not available") {
-    val config = new Config().setRequestTimeout(20).setReadTimeout(20).setConnectTimeout(20)
-    val client = new HttpClient(host, port, null, null, config)
+  test("Future fails on connection refused") {
+    val config = new Config()
+    val client = new HttpClient(host, port + 1, null, null, config)
 
-    val future = client.get("/query", Map("q" -> "SHOW DATABASES"))
-    Await.result(future, 5.seconds)
+    val future = client.get("/query")
+    try {
+      Await.result(future, 5.seconds)
+      fail("Did not throw exception")
+    } catch {
+      case e: HttpException =>
+    }
   }
 
   test("Future fails if response takes too long") {
@@ -73,6 +78,21 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
 
     val config = new Config().setRequestTimeout(50)
     val client = new HttpClient(host, port, null, null, config)
+
+    val future = client.get(url)
+    try {
+      Await.result(future, 5.seconds)
+      fail("Did not throw exception")
+    } catch {
+      case e: HttpException =>
+    }
+  }
+
+  test("Future fails if the connection takes too long to establish") {
+    val url = "/query"
+
+    val config = new Config().setConnectTimeout(50)
+    val client = new HttpClient("192.0.2.1", port, null, null, config)
 
     val future = client.get(url)
     try {
