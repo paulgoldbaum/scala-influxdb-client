@@ -33,11 +33,11 @@ protected object HttpClient {
   }
 }
 
-protected class HttpClient(host: String,
-                 port: Int,
-                 username: String = null,
-                 password: String = null,
-                 clientConfig: HttpClient.Config = null)
+protected class HttpClient(val host: String,
+                 val port: Int,
+                 val username: String = null,
+                 val password: String = null,
+                 val clientConfig: HttpClient.Config = null)
 {
   import HttpClient._
 

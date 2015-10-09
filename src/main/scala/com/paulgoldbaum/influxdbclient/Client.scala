@@ -3,13 +3,12 @@ package com.paulgoldbaum.influxdbclient
 import scala.concurrent.{Future, ExecutionContext}
 
 class Client protected[influxdbclient]
-(val host: String, val port: Int, val username: String = null, val password: String = null) {
+(httpClient: HttpClient) {
 
-  val httpClient = new HttpClient(host, port, username, password)
   implicit val ec = ExecutionContext.global
 
   def selectDatabase(databaseName: String) =
-    new Database(host, port, username, password, databaseName)
+    new Database(databaseName, httpClient)
 
   def showDatabases(): Future[Seq[String]] = {
     query("SHOW DATABASES")
@@ -27,5 +26,7 @@ class Client protected[influxdbclient]
   }
 
   protected def getQueryParameters(query: String) = Map("q" -> query)
+
+  protected[influxdbclient] def getHttpClient = httpClient
 
 }

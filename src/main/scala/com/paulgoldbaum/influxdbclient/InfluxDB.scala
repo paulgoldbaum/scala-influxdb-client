@@ -7,7 +7,8 @@ object InfluxDB {
              username: String = null,
              password: String = null): Client =
  {
-   new Client(host, port, username, password)
+   val httpClient = new HttpClient(host, port, username, password)
+   new Client(httpClient)
  }
 
 }

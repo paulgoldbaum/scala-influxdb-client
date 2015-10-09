@@ -5,11 +5,9 @@ import com.paulgoldbaum.influxdbclient.WriteParameters.Precision.Precision
 
 import scala.concurrent.Future
 
-class Database protected[influxdbclient] (override val host: String,
-               override val port: Int,
-               override val username: String,
-               override val password: String,
-               val databaseName: String) extends Client(host, port, username, password)
+class Database protected[influxdbclient]
+(val databaseName: String, val httpClient: HttpClient)
+extends Client(httpClient)
 {
 
   def create() = {

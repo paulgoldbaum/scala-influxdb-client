@@ -6,11 +6,12 @@ class InfluxDBSuite extends FunSuite {
 
   test("Asking for a connection returns default parameters") {
     val influxdb = InfluxDB.connect()
+    val httpClient = influxdb.getHttpClient
 
-    assert(influxdb.host == "localhost")
-    assert(influxdb.port == 8086)
-    assert(influxdb.username == null)
-    assert(influxdb.password == null)
+    assert(httpClient.host == "localhost")
+    assert(httpClient.port == 8086)
+    assert(httpClient.username == null)
+    assert(httpClient.password == null)
   }
 
   test("Overridden parameters are returned in client") {
@@ -20,11 +21,12 @@ class InfluxDBSuite extends FunSuite {
       username = "user",
       password = "password"
     )
+    val httpClient = influxdb.getHttpClient
 
-    assert(influxdb.host == "testdomain.com")
-    assert(influxdb.port == 1234)
-    assert(influxdb.username == "user")
-    assert(influxdb.password == "password")
+    assert(httpClient.host == "testdomain.com")
+    assert(httpClient.port == 1234)
+    assert(httpClient.username == "user")
+    assert(httpClient.password == "password")
   }
 
 }
