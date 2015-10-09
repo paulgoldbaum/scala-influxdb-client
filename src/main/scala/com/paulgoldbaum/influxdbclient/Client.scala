@@ -21,9 +21,9 @@ class Client protected[influxdbclient]
       .map(response => QueryResponse.fromJson(response.content))
   }
 
-  def queryWithoutResult(query: String): Future[EmptyResponse] = {
+  def queryWithoutResult(query: String): Future[EmptyResponse.type] = {
     httpClient.get("/query", getQueryParameters(query))
-      .map(response => new EmptyResponse)
+      .map(response => EmptyResponse)
   }
 
   protected def getQueryParameters(query: String) = Map("q" -> query)

@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
 import org.scalatest.FunSuite
-import spray.json.JsonParser
+import spray.json.{JsString, JsonParser}
 
 class QueryResponseSuite extends FunSuite {
 
@@ -21,6 +21,16 @@ class QueryResponseSuite extends FunSuite {
     assert(record("second_metric") == "second value")
   }
 
+  test("Constructing a record with unsupported types throws a MalformedResponseException") {
+    try {
+      val data = JsonParser( """[{}, "second value"]""")
+      val record = QueryResponse.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
+      fail("Exception not thrown")
+    } catch {
+      case e: MalformedResponseException =>
+    }
+  }
+
   test("Construct series") {
     val data = JsonParser("""{"name":"test_series","columns":["column1", "column2", "column3"],"values":[["value1", 2, true]]}""")
     val series = QueryResponse.constructSeries(data)
@@ -35,6 +45,16 @@ class QueryResponseSuite extends FunSuite {
     assert(record("column3") == true)
   }
 
+  test("Constructing a series with unsupported types throws a MalformedResponseException") {
+    try {
+      val data = JsonParser("""{"name":"test_series","columns":[1],"values":[]}""")
+      val series = QueryResponse.constructSeries(data)
+      fail("Exception not thrown")
+    } catch {
+      case e: MalformedResponseException =>
+    }
+  }
+
   test("Value series can be accessed by name and position") {
     val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
     val series = QueryResponse.constructSeries(data)
@@ -45,14 +65,11 @@ class QueryResponseSuite extends FunSuite {
     assert(series.points(1) == List(2, 3, 4, 5))
   }
 
-  /*
-  test("Invalid record value types throw exception") {}
-  */
+  ignore("Valid error responses return an error response") {
+    // {"results":[{"error":"database not found: _test"}]}
+  }
 
-  // test errors return error response
-  // {"results":[{"error":"database not found: _test"}]}
-
-  // empty responses handled correctly
-  // {"results":[{}]}
-
+  ignore("Empty responses are handled correctly") {
+    // {"results":[{}]}
+  }
 }
