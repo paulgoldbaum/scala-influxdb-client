@@ -26,10 +26,10 @@ extends Client(httpClient)
     val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
     httpClient.post("write", params, point.serialize())
-      .recover { case error => throw new WriteException("Error during write", error) }
+      .recover { case error: HttpException => throw exceptionFromStatusCode(error.code, "Error during write", error)}
       .map { result =>
         if (result.code != 204)
-          throw new WriteException("Error during write: " + result.content, null)
+          throw exceptionFromStatusCode(result.code, "Error during write: " + result.content)
         true
       }
   }
@@ -46,6 +46,20 @@ extends Client(httpClient)
   override protected def getQueryParameters(query: String) = {
     super.getQueryParameters(query) + ("db" -> databaseName)
   }
+
+  def exceptionFromStatusCode(statusCode: Int, str: String, throwable: Throwable = null): WriteException = statusCode match {
+    case 200 => new RequestNotCompletedException(str, throwable)
+    case 404 => new DatabaseNotFoundException(str, throwable)
+    case e if 400 <= e && e <= 499 => new MalformedRequestException(str, throwable)
+    case e if 500 <= e && e <= 599 => new ServerUnavailableException(str, throwable)
+    case _ => new UnknownErrorException(str, throwable)
+  }
 }
 
-class WriteException(str: String, throwable: Throwable) extends Exception(str, throwable)
+
+abstract class WriteException(str: String, throwable: Throwable = null) extends Exception(str, throwable)
+class DatabaseNotFoundException(str: String, throwable: Throwable) extends WriteException(str, throwable)
+class MalformedRequestException(str: String, throwable: Throwable) extends WriteException(str, throwable)
+class RequestNotCompletedException(str: String, throwable: Throwable) extends WriteException(str, throwable)
+class ServerUnavailableException(str: String, throwable: Throwable) extends WriteException(str, throwable)
+class UnknownErrorException(str: String, throwable: Throwable) extends WriteException(str, throwable)

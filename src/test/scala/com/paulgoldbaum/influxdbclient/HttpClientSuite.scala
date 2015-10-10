@@ -50,7 +50,7 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
-        assert(e.getMessage.contains("500"))
+        assert(e.code == 500)
     }
   }
 

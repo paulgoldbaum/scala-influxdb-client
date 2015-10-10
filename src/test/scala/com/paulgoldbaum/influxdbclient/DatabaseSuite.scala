@@ -1,9 +1,10 @@
 package com.paulgoldbaum.influxdbclient
 
+import com.paulgoldbaum.influxdbclient.HttpClient.HttpResponse
 import com.paulgoldbaum.influxdbclient.WriteParameters.{Precision, Consistency}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 class DatabaseSuite extends FunSuite with BeforeAndAfter {
@@ -11,6 +12,14 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   val influxdb = InfluxDB.connect()
   val database = influxdb.selectDatabase("_test")
   val waitDuration = 1.second
+
+  before {
+    Await.result(database.create(), waitDuration)
+  }
+
+  after {
+    Await.result(database.drop(), waitDuration)
+  }
 
   test("A database can be created and dropped") {
     val influxdb = InfluxDB.connect()
@@ -25,12 +34,16 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
     assert(!databases.contains("_test_database"))
   }
 
-  before {
-    Await.result(database.create(), waitDuration)
-  }
+  test("Write to non-existent database") {
+    val influxdb = InfluxDB.connect()
+    val database = influxdb.selectDatabase("_test_database")
 
-  after {
-    Await.result(database.drop(), waitDuration)
+    try {
+      Await.result(database.write(Point("test_measurement").addField("value", 123)), waitDuration)
+      fail("Exception not thrown")
+    } catch {
+      case e: DatabaseNotFoundException => // expected
+    }
   }
 
   test("A point can be written and read") {
@@ -85,13 +98,56 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
     }
   }
 
-  // Write to database that doesn't exist should throw error
+  test("If an exception occurrs during a write, a WriteException is thrown") {
+    val database = new Database("fake_name", new ExceptionThrowingHttpClient("", 1))
+    try {
+      Await.result(database.write(new Point("point")), waitDuration)
+      fail("Exception was not thrown")
+    } catch {
+      case e: WriteException => // expected
+    }
+  }
 
-  // Empty results show throw error
-  // {"results":[{}]}
+  test("If a 200 code is return during a write, a MalformedRequestException is thrown") {
+    val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 200))
+    try {
+      Await.result(database.write(new Point("point")), waitDuration)
+      fail("Exception was not thrown")
+    } catch {
+      case e: RequestNotCompletedException => // expected
+    }
+  }
 
-  // error codes 4xx 5xx
+  test("If a 400 error occurrs during a write, a MalformedRequestException is thrown") {
+    val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 400))
+    try {
+      Await.result(database.write(new Point("point")), waitDuration)
+      fail("Exception was not thrown")
+    } catch {
+      case e: MalformedRequestException => // expected
+    }
+  }
 
-  // methods relying on queryWithoutResult (create database, drop database) should return empty ok response
+  test("If a 500 error occurrs during a write, a ServerUnavailableException is thrown") {
+    val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 500))
+    try {
+      Await.result(database.write(new Point("point")), waitDuration)
+      fail("Exception was not thrown")
+    } catch {
+      case e: ServerUnavailableException => // expected
+    }
+  }
 
+  class ExceptionThrowingHttpClient(host: String, port: Int) extends HttpClient(host, port) {
+    override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
+      Future.failed(new HttpException(""))
+    }
+  }
+
+  class ErrorReturningHttpClient(host: String, port: Int, errorCode: Int) extends HttpClient(host, port) {
+    override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
+      Future.successful(new HttpResponse(errorCode, "Error message"))
+    }
+  }
 }
+

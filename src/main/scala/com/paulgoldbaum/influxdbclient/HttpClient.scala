@@ -85,17 +85,18 @@ protected class HttpClient(val host: String,
 
     override def onCompleted(response: Response): Response = {
       if (response.getStatusCode >= 400)
-        promise.failure(new HttpException("Server answered with error code " + response.getStatusCode))
+        promise.failure(new HttpException("Server answered with error code", response.getStatusCode))
       else
         promise.success(new HttpResponse(response.getStatusCode, response.getResponseBody))
       response
     }
 
     override def onThrowable(throwable: Throwable) = {
-      promise.failure(new HttpException("An error occurred during the request", throwable))
+      promise.failure(new HttpException("An error occurred during the request", -1, throwable))
     }
   }
 
 }
 
-class HttpException(str: String, throwable: Throwable = null) extends Exception(str, throwable)
+class HttpException protected[influxdbclient]
+(val str: String, val code: Int = -1, val throwable: Throwable = null) extends Exception(str, throwable)
