@@ -34,7 +34,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
     assert(!databases.contains("_test_database"))
   }
 
-  test("Write to non-existent database") {
+  test("Writing to a non-existent database throws a DatabaseNotFoundException") {
     val influxdb = InfluxDB.connect()
     val database = influxdb.selectDatabase("_test_database")
 

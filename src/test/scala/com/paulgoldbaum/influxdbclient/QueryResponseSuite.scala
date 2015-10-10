@@ -65,8 +65,14 @@ class QueryResponseSuite extends FunSuite {
     assert(series.points(1) == List(2, 3, 4, 5))
   }
 
-  ignore("Valid error responses return an error response") {
-    // {"results":[{"error":"database not found: _test"}]}
+  test("Valid error responses throws an ErrorResponseException") {
+    val data = """{"results":[{"error":"database not found: _test"}]}"""
+    try {
+      QueryResponse.fromJson(data)
+      fail("Exception not thrown")
+    } catch {
+      case e: ErrorResponseException => // expected
+    }
   }
 
   ignore("Empty responses are handled correctly") {

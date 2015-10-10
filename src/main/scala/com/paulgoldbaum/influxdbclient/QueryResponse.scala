@@ -21,7 +21,11 @@ object QueryResponse {
     val root = data.parseJson.asInstanceOf[JsObject]
     val resultsArray = root.fields("results").asInstanceOf[JsArray]
     val resultObject = resultsArray.elements.head.asInstanceOf[JsObject]
-    val seriesArray = resultObject.fields("series").asInstanceOf[JsArray]
+    val fields = resultObject.fields
+    if (fields.contains("error")) {
+      throw new ErrorResponseException(fields("error").toString())
+    }
+    val seriesArray = fields("series").asInstanceOf[JsArray]
 
     val series = seriesArray.elements.map(constructSeries).toList
     new QueryResponse(series)
@@ -55,9 +59,12 @@ object QueryResponse {
   }
 }
 
+abstract class QueryResponseException(message: String = null, throwable: Throwable = null) extends Exception(message, throwable)
 class MalformedResponseException(message: String = null, throwable: Throwable = null)
-  extends Exception(message, throwable)
+  extends QueryResponseException(message, throwable)
+
+class ErrorResponseException(message: String = null, throwable: Throwable = null)
+  extends QueryResponseException(message, throwable)
 
 class QueryResponse protected[influxdbclient] (val series: List[Series]) {}
-
 object EmptyResponse
