@@ -1,6 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-trait RetentionPolicyManagement { self: Database =>
+protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
   def createRetentionPolicy(name: String, duration: String, replication: Int, default: Boolean) = {
     var stringBuilder = new StringBuilder()
       .append("CREATE RETENTION POLICY ").append(name)

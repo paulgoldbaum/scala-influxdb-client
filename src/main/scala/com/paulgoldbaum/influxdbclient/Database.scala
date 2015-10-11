@@ -31,7 +31,10 @@ extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagemen
                                    consistency: Consistency = null,
                                    retentionPolicy: String = null): Map[String, String] =
   {
-    val params = List(("db", databaseName), ("precision", precision), ("consistency", consistency), ("rp", retentionPolicy))
+    val params = List(("db", databaseName),
+      ("precision", precision),
+      ("consistency", consistency),
+      ("rp", retentionPolicy))
     params.filterNot(_._2 == null).map(r => (r._1, r._2.toString)).toMap
   }
 
@@ -39,12 +42,13 @@ extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagemen
     super.getQueryParameters(query) + ("db" -> databaseName)
   }
 
-  def exceptionFromStatusCode(statusCode: Int, str: String, throwable: Throwable = null): WriteException = statusCode match {
-    case 200 => new RequestNotCompletedException(str, throwable)
-    case 404 => new DatabaseNotFoundException(str, throwable)
-    case e if 400 <= e && e <= 499 => new MalformedRequestException(str, throwable)
-    case e if 500 <= e && e <= 599 => new ServerUnavailableException(str, throwable)
-    case _ => new UnknownErrorException(str, throwable)
+  protected def exceptionFromStatusCode(statusCode: Int, str: String, throwable: Throwable = null): WriteException =
+    statusCode match {
+      case 200 => new RequestNotCompletedException(str, throwable)
+      case 404 => new DatabaseNotFoundException(str, throwable)
+      case e if 400 <= e && e <= 499 => new MalformedRequestException(str, throwable)
+      case e if 500 <= e && e <= 599 => new ServerUnavailableException(str, throwable)
+      case _ => new UnknownErrorException(str, throwable)
   }
 }
 

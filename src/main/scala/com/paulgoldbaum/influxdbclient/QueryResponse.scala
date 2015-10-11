@@ -68,7 +68,9 @@ object QueryResponse {
   }
 }
 
-abstract class QueryResponseException(message: String = null, throwable: Throwable = null) extends Exception(message, throwable)
+abstract class QueryResponseException(message: String = null, throwable: Throwable = null)
+  extends Exception(message, throwable)
+
 class MalformedResponseException(message: String = null, throwable: Throwable = null)
   extends QueryResponseException(message, throwable)
 
