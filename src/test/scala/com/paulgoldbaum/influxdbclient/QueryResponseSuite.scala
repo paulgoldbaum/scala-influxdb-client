@@ -75,7 +75,9 @@ class QueryResponseSuite extends FunSuite {
     }
   }
 
-  ignore("Empty responses are handled correctly") {
-    // {"results":[{}]}
+  test("Empty responses return a QueryResponse with no series") {
+    val data = """{"results":[{}]}"""
+    val response = QueryResponse.fromJson(data)
+    assert(response.series.isEmpty)
   }
 }
