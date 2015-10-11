@@ -7,7 +7,7 @@ import scala.concurrent.Future
 
 class Database protected[influxdbclient]
 (val databaseName: String, val httpClient: HttpClient)
-extends Client(httpClient)
+extends Client(httpClient) with RetentionPolicyManagement
 {
 
   def create() = {

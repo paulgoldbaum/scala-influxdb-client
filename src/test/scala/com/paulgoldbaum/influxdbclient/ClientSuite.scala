@@ -18,4 +18,7 @@ class ClientSuite extends FunSuite with Matchers {
     assert(result.contains("_internal"))
   }
 
+  ignore("A retention policy can be used while reading") {
+  }
+
 }

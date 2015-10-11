@@ -45,6 +45,15 @@ class QueryResponseSuite extends FunSuite {
     assert(record("column3") == true)
   }
 
+  test("Construct series without a name") {
+    val data = JsonParser("""{"columns":["column1", "column2", "column3"],"values":[["value1", 2, true]]}""")
+    val series = QueryResponse.constructSeries(data)
+
+    assert(series.name == "")
+    assert(series.columns == List("column1", "column2", "column3"))
+    assert(series.records.length == 1)
+  }
+
   test("Constructing a series with unsupported types throws a MalformedResponseException") {
     try {
       val data = JsonParser("""{"name":"test_series","columns":[1],"values":[]}""")

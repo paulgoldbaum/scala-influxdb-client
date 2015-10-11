@@ -39,7 +39,11 @@ object QueryResponse {
   protected[influxdbclient]
   def constructSeries(value: JsValue): Series = {
     val fields = value.asInstanceOf[JsObject].fields
-    val seriesName = fields("name").asInstanceOf[JsString].value
+    val seriesName = if (fields.contains("name"))
+      fields("name").asInstanceOf[JsString].value
+    else
+      ""
+
     val columns = fields("columns").asInstanceOf[JsArray].elements.map {
       case JsString(column) => column
       case t => throw new MalformedResponseException("Found invalid type " + t.toString())
