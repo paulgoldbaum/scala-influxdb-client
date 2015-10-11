@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
 trait RetentionPolicyManagement { self: Database =>
-  def createRetentionPolicy(name: String, duration: String, replication: Int, default: Boolean = false) = {
+  def createRetentionPolicy(name: String, duration: String, replication: Int, default: Boolean) = {
     var stringBuilder = new StringBuilder()
       .append("CREATE RETENTION POLICY ").append(name)
       .append(" ON ").append(databaseName)
@@ -21,6 +21,9 @@ trait RetentionPolicyManagement { self: Database =>
     query("DROP RETENTION POLICY " + name + " ON " + databaseName)
 
   def alterRetentionPolicy(name: String, duration: String = null, replication: Int = -1, default: Boolean = false) = {
+    if (duration == null && replication == -1 && !default)
+      throw new InvalidRetentionPolicyParametersException("At least one parameter has to be set")
+
     var stringBuilder = new StringBuilder()
       .append("ALTER RETENTION POLICY ").append(name)
       .append(" ON ").append(databaseName)
@@ -35,4 +38,7 @@ trait RetentionPolicyManagement { self: Database =>
 
     queryWithoutResult(stringBuilder.toString())
   }
+
 }
+
+class InvalidRetentionPolicyParametersException(str: String) extends Exception(str)
