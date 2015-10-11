@@ -21,19 +21,6 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
     Await.result(database.drop(), waitDuration)
   }
 
-  test("A database can be created and dropped") {
-    val influxdb = InfluxDB.connect()
-    val database = influxdb.selectDatabase("_test_database")
-
-    Await.result(database.create(), waitDuration)
-    var databases = Await.result(database.showDatabases(), waitDuration)
-    assert(databases.contains("_test_database"))
-
-    Await.result(database.drop(), waitDuration)
-    databases = Await.result(database.showDatabases(), waitDuration)
-    assert(!databases.contains("_test_database"))
-  }
-
   test("Writing to a non-existent database throws a DatabaseNotFoundException") {
     val influxdb = InfluxDB.connect()
     val database = influxdb.selectDatabase("_test_database")

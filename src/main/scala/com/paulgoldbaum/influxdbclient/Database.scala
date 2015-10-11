@@ -7,16 +7,8 @@ import scala.concurrent.Future
 
 class Database protected[influxdbclient]
 (val databaseName: String, val httpClient: HttpClient)
-extends Client(httpClient) with RetentionPolicyManagement
+extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagement
 {
-
-  def create() = {
-    queryWithoutResult("CREATE DATABASE \"" + databaseName + "\"")
-  }
-
-  def drop() = {
-    queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
-  }
 
   def write(point: Point,
             precision: Precision = null,
