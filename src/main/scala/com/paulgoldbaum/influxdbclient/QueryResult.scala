@@ -14,10 +14,10 @@ class Series protected[influxdbclient]
   def points(column: Int) = records.map(_(column))
 }
 
-object QueryResponse {
+object QueryResult {
 
   protected[influxdbclient]
-  def fromJson(data: String): QueryResponse = {
+  def fromJson(data: String): QueryResult = {
     val root = data.parseJson.asInstanceOf[JsObject]
     val resultsArray = root.fields("results").asInstanceOf[JsArray]
     val resultObject = resultsArray.elements.head.asInstanceOf[JsObject]
@@ -28,12 +28,12 @@ object QueryResponse {
     }
 
     if (!fields.contains("series")) {
-      return new QueryResponse()
+      return new QueryResult()
     }
     val seriesArray = fields("series").asInstanceOf[JsArray]
 
     val series = seriesArray.elements.map(constructSeries).toList
-    new QueryResponse(series)
+    new QueryResult(series)
   }
 
   protected[influxdbclient]
@@ -71,13 +71,13 @@ object QueryResponse {
   }
 }
 
-abstract class QueryResponseException(message: String = null, throwable: Throwable = null)
+abstract class QueryResultException(message: String = null, throwable: Throwable = null)
   extends Exception(message, throwable)
 
 class MalformedResponseException(message: String = null, throwable: Throwable = null)
-  extends QueryResponseException(message, throwable)
+  extends QueryResultException(message, throwable)
 
 class ErrorResponseException(message: String = null, throwable: Throwable = null)
-  extends QueryResponseException(message, throwable)
+  extends QueryResultException(message, throwable)
 
-class QueryResponse protected[influxdbclient] (val series: List[Series] = List()) {}
+class QueryResult protected[influxdbclient] (val series: List[Series] = List()) {}

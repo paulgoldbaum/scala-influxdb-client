@@ -26,9 +26,9 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
       .map(response => response.series.head.points("name").asInstanceOf[List[String]])
   }
 
-  def query(query: String): Future[QueryResponse] = {
+  def query(query: String): Future[QueryResult] = {
     httpClient.get("/query", buildQueryParameters(query))
-      .map(response => QueryResponse.fromJson(response.content))
+      .map(response => QueryResult.fromJson(response.content))
   }
 
   protected def buildQueryParameters(query: String) = Map("q" -> query)

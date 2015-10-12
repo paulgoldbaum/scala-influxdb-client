@@ -2,18 +2,18 @@ package com.paulgoldbaum.influxdbclient
 
 import spray.json.JsonParser
 
-class QueryResponseSuite extends CustomTestSuite {
+class QueryResultSuite extends CustomTestSuite {
 
-  test("Construct response") {
+  test("Construct result") {
     val data = """{"results":[{"series":[{"name":"databases","columns":["name"],"values":[["_internal"]]}]}]}"""
-    val queryResponse = QueryResponse.fromJson(data)
+    val queryResponse = QueryResult.fromJson(data)
 
     assert(queryResponse.series.length == 1)
   }
 
   test("Construct record") {
     val data = JsonParser("""[1, "second value"]""")
-    val record = QueryResponse.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
+    val record = QueryResult.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
     assert(record(0) == 1)
     assert(record("first_metric") == 1)
     assert(record(1) == "second value")
@@ -23,7 +23,7 @@ class QueryResponseSuite extends CustomTestSuite {
   test("Constructing a record with unsupported types throws a MalformedResponseException") {
     try {
       val data = JsonParser( """[{}, "second value"]""")
-      val record = QueryResponse.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
+      val record = QueryResult.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
       fail("Exception not thrown")
     } catch {
       case e: MalformedResponseException =>
@@ -32,7 +32,7 @@ class QueryResponseSuite extends CustomTestSuite {
 
   test("Construct series") {
     val data = JsonParser("""{"name":"test_series","columns":["column1", "column2", "column3"],"values":[["value1", 2, true]]}""")
-    val series = QueryResponse.constructSeries(data)
+    val series = QueryResult.constructSeries(data)
 
     assert(series.name == "test_series")
     assert(series.columns == List("column1", "column2", "column3"))
@@ -46,7 +46,7 @@ class QueryResponseSuite extends CustomTestSuite {
 
   test("Construct series without a name") {
     val data = JsonParser("""{"columns":["column1", "column2", "column3"],"values":[["value1", 2, true]]}""")
-    val series = QueryResponse.constructSeries(data)
+    val series = QueryResult.constructSeries(data)
 
     assert(series.name == "")
     assert(series.columns == List("column1", "column2", "column3"))
@@ -55,7 +55,7 @@ class QueryResponseSuite extends CustomTestSuite {
 
   test("Construct series without values") {
     val data = JsonParser("""{"columns":["column1", "column2", "column3"]}""")
-    val series = QueryResponse.constructSeries(data)
+    val series = QueryResult.constructSeries(data)
 
     assert(series.name == "")
     assert(series.columns == List("column1", "column2", "column3"))
@@ -65,7 +65,7 @@ class QueryResponseSuite extends CustomTestSuite {
   test("Constructing a series with unsupported types throws a MalformedResponseException") {
     try {
       val data = JsonParser("""{"name":"test_series","columns":[1],"values":[]}""")
-      val series = QueryResponse.constructSeries(data)
+      val series = QueryResult.constructSeries(data)
       fail("Exception not thrown")
     } catch {
       case e: MalformedResponseException =>
@@ -74,7 +74,7 @@ class QueryResponseSuite extends CustomTestSuite {
 
   test("Value series can be accessed by name and position") {
     val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
-    val series = QueryResponse.constructSeries(data)
+    val series = QueryResult.constructSeries(data)
 
     assert(series.points("column1") == List(1, 2, 3, 4))
     assert(series.points(0) == List(1, 2, 3, 4))
@@ -85,7 +85,7 @@ class QueryResponseSuite extends CustomTestSuite {
   test("Valid error responses throws an ErrorResponseException") {
     val data = """{"results":[{"error":"database not found: _test"}]}"""
     try {
-      QueryResponse.fromJson(data)
+      QueryResult.fromJson(data)
       fail("Exception not thrown")
     } catch {
       case e: ErrorResponseException => // expected
@@ -94,7 +94,7 @@ class QueryResponseSuite extends CustomTestSuite {
 
   test("Empty responses return a QueryResponse with no series") {
     val data = """{"results":[{}]}"""
-    val response = QueryResponse.fromJson(data)
+    val response = QueryResult.fromJson(data)
     assert(response.series.isEmpty)
   }
 }

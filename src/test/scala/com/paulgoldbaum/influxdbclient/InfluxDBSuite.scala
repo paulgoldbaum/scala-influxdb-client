@@ -37,7 +37,4 @@ class InfluxDBSuite extends CustomTestSuite {
     val result = await(client.showDatabases())
     assert(result.contains("_internal"))
   }
-
-  ignore("A retention policy can be used while reading") {
-  }
 }
