@@ -1,11 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.{Matchers, FunSuite}
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
-class ClientSuite extends FunSuite with Matchers {
+class ClientSuite extends CustomTestSuite {
 
   test("Returns correct database") {
     val database = new Client(new HttpClient("", 1, "", "")).selectDatabase("test_database")
@@ -14,7 +9,7 @@ class ClientSuite extends FunSuite with Matchers {
 
   test("Shows existing databases") {
     val client = new Client(new HttpClient("localhost", 8086))
-    val result = Await.result(client.showDatabases(), 2.seconds)
+    val result = await(client.showDatabases())
     assert(result.contains("_internal"))
   }
 

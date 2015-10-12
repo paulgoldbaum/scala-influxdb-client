@@ -6,23 +6,20 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 
 import com.paulgoldbaum.influxdbclient.HttpClient.Config
-import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.scalatest.BeforeAndAfter
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
-class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
+class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
 
   var host = "localhost"
   var port = 64011
   var mockServer: WireMockServer = new WireMockServer(wireMockConfig().port(port))
 
-  override def beforeEach() = {
+  before {
     mockServer.start()
     WireMock.configureFor(host, port)
   }
 
-  override def afterEach() = {
+  after {
     mockServer.stop()
   }
 
@@ -31,7 +28,7 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(200).withBody("")))
     val client = new HttpClient(host, port)
     val future = client.get(url)
-    val result = Await.result(future, 5.seconds)
+    val result = await(future)
     assert(result.code == 200)
   }
 
@@ -44,9 +41,8 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
           .withBody("")))
 
     val client = new HttpClient(host, port)
-    val future = client.get(url)
     try {
-      Await.result(future, 5.seconds)
+      await(client.get(url))
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
@@ -58,9 +54,8 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     val config = new Config()
     val client = new HttpClient(host, port + 1, null, null, config)
 
-    val future = client.get("/query")
     try {
-      Await.result(future, 5.seconds)
+      await(client.get("/query"))
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
@@ -79,9 +74,8 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     val config = new Config().setRequestTimeout(50)
     val client = new HttpClient(host, port, null, null, config)
 
-    val future = client.get(url)
     try {
-      Await.result(future, 5.seconds)
+      await(client.get(url))
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
@@ -100,9 +94,8 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     val config = new Config().setReadTimeout(50)
     val client = new HttpClient(host, port, null, null, config)
 
-    val future = client.get(url)
     try {
-      Await.result(future, 5.seconds)
+      await(client.get(url))
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
@@ -115,9 +108,8 @@ class HttpClientSuite extends FunSuite with BeforeAndAfterEach {
     val config = new Config().setConnectTimeout(50)
     val client = new HttpClient("192.0.2.1", port, null, null, config)
 
-    val future = client.get(url)
     try {
-      Await.result(future, 5.seconds)
+      await(client.get(url))
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>

@@ -2,23 +2,21 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.HttpClient.HttpResponse
 import com.paulgoldbaum.influxdbclient.WriteParameters.{Precision, Consistency}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
 
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration._
+import scala.concurrent.Future
 
-class DatabaseSuite extends FunSuite with BeforeAndAfter {
+class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
 
   val influxdb = InfluxDB.connect()
   val database = influxdb.selectDatabase("_test")
-  val waitDuration = 1.second
 
   before {
-    Await.result(database.create(), waitDuration)
+    await(database.create())
   }
 
   after {
-    Await.result(database.drop(), waitDuration)
+    await(database.drop())
   }
 
   test("Writing to a non-existent database throws a DatabaseNotFoundException") {
@@ -26,7 +24,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
     val database = influxdb.selectDatabase("_test_database")
 
     try {
-      Await.result(database.write(Point("test_measurement").addField("value", 123)), waitDuration)
+      await(database.write(Point("test_measurement").addField("value", 123)))
       fail("Exception not thrown")
     } catch {
       case e: DatabaseNotFoundException => // expected
@@ -34,51 +32,47 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("A point can be written and read") {
-    Await.result(database.write(Point("test_measurement").addField("value", 123)), waitDuration)
-    val result = Await.result(database.query("SELECT * FROM test_measurement"), waitDuration)
+    await(database.write(Point("test_measurement").addField("value", 123)))
+    val result = await(database.query("SELECT * FROM test_measurement"))
     assert(result.series.length == 1)
   }
 
   test("A point can be written with tags") {
-    Await.result(database.write(Point("test_measurement").addField("value", 123).addTag("tag_key", "tag_value")), waitDuration)
-    val result = Await.result(database.query("SELECT * FROM test_measurement WHERE tag_key='tag_value'"), waitDuration)
+    await(database.write(Point("test_measurement").addField("value", 123).addTag("tag_key", "tag_value")))
+    val result = await(database.query("SELECT * FROM test_measurement WHERE tag_key='tag_value'"))
     assert(result.series.length == 1)
   }
 
   test("A point can be written with a precision parameter") {
-    Await.result(
+    await(
       database.write(Point("test_measurement", 11111111).addField("value", 123),
-                     precision = Precision.NANOSECONDS),
-      waitDuration)
-    val result = Await.result(database.query("SELECT * FROM test_measurement"), waitDuration)
+                     precision = Precision.NANOSECONDS))
+    val result = await(database.query("SELECT * FROM test_measurement"))
     assert(result.series.length == 1)
   }
 
   test("A point can be written with a consistency parameter") {
-    Await.result(
+    await(
       database.write(Point("test_measurement", 11111111).addField("value", 123),
-        consistency = Consistency.ALL),
-      waitDuration)
-    val result = Await.result(database.query("SELECT * FROM test_measurement"), waitDuration)
+        consistency = Consistency.ALL))
+    val result = await(database.query("SELECT * FROM test_measurement"))
     assert(result.series.length == 1)
   }
 
   test("A point can be written with a retention policy parameter") {
-    Await.result(
+    await(
       database.write(Point("test_measurement", 11111111).addField("value", 123),
-        retentionPolicy = "default"),
-      waitDuration)
-    val result = Await.result(database.query("SELECT * FROM test_measurement"), waitDuration)
+        retentionPolicy = "default"))
+    val result = await(database.query("SELECT * FROM test_measurement"))
     assert(result.series.length == 1)
   }
 
   ignore("Writing to a non-existent retention policy throws an error") {
     // Makes influxdb explode. https://github.com/influxdb/influxdb/issues/4318
     try {
-      Await.result(
+      await(
         database.write(Point("test_measurement", 11111111).addField("value", 123),
-          retentionPolicy = "fake_retention_policy"),
-        waitDuration)
+          retentionPolicy = "fake_retention_policy"))
       fail("Write using non-existent retention policy did not fail")
     } catch {
       case e: WriteException => // expected
@@ -88,7 +82,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   test("If an exception occurrs during a write, a WriteException is thrown") {
     val database = new Database("fake_name", new ExceptionThrowingHttpClient("", 1))
     try {
-      Await.result(database.write(new Point("point")), waitDuration)
+      await(database.write(new Point("point")))
       fail("Exception was not thrown")
     } catch {
       case e: WriteException => // expected
@@ -98,7 +92,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   test("If a 200 code is return during a write, a MalformedRequestException is thrown") {
     val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 200))
     try {
-      Await.result(database.write(new Point("point")), waitDuration)
+      await(database.write(new Point("point")))
       fail("Exception was not thrown")
     } catch {
       case e: RequestNotCompletedException => // expected
@@ -108,7 +102,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   test("If a 400 error occurrs during a write, a MalformedRequestException is thrown") {
     val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 400))
     try {
-      Await.result(database.write(new Point("point")), waitDuration)
+      await(database.write(new Point("point")))
       fail("Exception was not thrown")
     } catch {
       case e: MalformedRequestException => // expected
@@ -118,7 +112,7 @@ class DatabaseSuite extends FunSuite with BeforeAndAfter {
   test("If a 500 error occurrs during a write, a ServerUnavailableException is thrown") {
     val database = new Database("fake_name", new ErrorReturningHttpClient("", 1, 500))
     try {
-      Await.result(database.write(new Point("point")), waitDuration)
+      await(database.write(new Point("point")))
       fail("Exception was not thrown")
     } catch {
       case e: ServerUnavailableException => // expected

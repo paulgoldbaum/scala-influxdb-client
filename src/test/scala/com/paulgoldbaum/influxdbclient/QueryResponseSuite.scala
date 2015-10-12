@@ -1,9 +1,8 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.FunSuite
-import spray.json.{JsString, JsonParser}
+import spray.json.JsonParser
 
-class QueryResponseSuite extends FunSuite {
+class QueryResponseSuite extends CustomTestSuite {
 
   test("Construct response") {
     val data = """{"results":[{"series":[{"name":"databases","columns":["name"],"values":[["_internal"]]}]}]}"""

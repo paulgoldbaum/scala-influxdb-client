@@ -1,24 +1,21 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
-class RetentionPolicyManagementSuite extends FunSuite with BeforeAndAfter {
+class RetentionPolicyManagementSuite extends CustomTestSuite with BeforeAndAfter {
 
   var database = new Database("_test_database_rp", new HttpClient("localhost", 8086))
   before {
-    Await.result(database.create(), 1.second)
+    await(database.create())
   }
 
   after {
-    Await.result(database.drop(), 1.second)
+    await(database.drop())
   }
 
   test("A retention policy can be created") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = true), 1.second)
-    val policies = Await.result(database.showRetentionPolicies(), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = true))
+    val policies = await(database.showRetentionPolicies())
     assert(policies.series.head.records.length == 2)
     val policy = policies.series.head.records(1)
     assert(policy("name") == "test_retention_policy")
@@ -28,44 +25,44 @@ class RetentionPolicyManagementSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("A retention policy can be created and deleted") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false), 1.second)
-    Await.result(database.dropRetentionPolicy("test_retention_policy"), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false))
+    await(database.dropRetentionPolicy("test_retention_policy"))
 
-    val policiesAfterDeleting = Await.result(database.showRetentionPolicies(), 1.second)
+    val policiesAfterDeleting = await(database.showRetentionPolicies())
     assert(policiesAfterDeleting.series.head.records.length == 1)
   }
 
   test("A retention policy's duration can be altered") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false), 1.second)
-    Await.result(database.alterRetentionPolicy("test_retention_policy", "2w"), 1.second)
-    val policies = Await.result(database.showRetentionPolicies(), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false))
+    await(database.alterRetentionPolicy("test_retention_policy", "2w"))
+    val policies = await(database.showRetentionPolicies())
     val policy = policies.series.head.records(1)
     assert(policy("name") == "test_retention_policy")
     assert(policy("duration") == "336h0m0s")
   }
 
   test("A retention policy's replication can be altered") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false), 1.second)
-    Await.result(database.alterRetentionPolicy("test_retention_policy", replication = 2), 1.second)
-    val policies = Await.result(database.showRetentionPolicies(), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false))
+    await(database.alterRetentionPolicy("test_retention_policy", replication = 2))
+    val policies = await(database.showRetentionPolicies())
     val policy = policies.series.head.records(1)
     assert(policy("name") == "test_retention_policy")
     assert(policy("replicaN") == 2)
   }
 
   test("A retention policy's defaultness can be altered") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false), 1.second)
-    Await.result(database.alterRetentionPolicy("test_retention_policy", default = true), 1.second)
-    val policies = Await.result(database.showRetentionPolicies(), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false))
+    await(database.alterRetentionPolicy("test_retention_policy", default = true))
+    val policies = await(database.showRetentionPolicies())
     val policy = policies.series.head.records(1)
     assert(policy("name") == "test_retention_policy")
     assert(policy("default") == true)
   }
 
   test("At least one parameter has to be altered") {
-    Await.result(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false), 1.second)
+    await(database.createRetentionPolicy("test_retention_policy", "1w", 1, default = false))
     try {
-      Await.result(database.alterRetentionPolicy("test_retention_policy"), 1.second)
+      await(database.alterRetentionPolicy("test_retention_policy"))
       fail("Exception was not thrown")
     } catch {
       case e: InvalidRetentionPolicyParametersException => // expected

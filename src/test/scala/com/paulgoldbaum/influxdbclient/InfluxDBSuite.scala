@@ -1,8 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.FunSuite
-
-class InfluxDBSuite extends FunSuite {
+class InfluxDBSuite extends CustomTestSuite {
 
   test("Asking for a connection returns default parameters") {
     val influxdb = InfluxDB.connect()

@@ -1,8 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.FunSuite
-
-class PointSuite extends FunSuite {
+class PointSuite extends CustomTestSuite {
 
   test("Minimal point is serialized correctly") {
     val point = Point("key")
