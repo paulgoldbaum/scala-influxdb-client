@@ -2,8 +2,7 @@ package com.paulgoldbaum.influxdbclient
 
 import scala.concurrent.{Future, ExecutionContext}
 
-class Client protected[influxdbclient]
-(httpClient: HttpClient) {
+class Client protected[influxdbclient](httpClient: HttpClient) extends Object with UserManagement {
 
   implicit val ec = ExecutionContext.global
 

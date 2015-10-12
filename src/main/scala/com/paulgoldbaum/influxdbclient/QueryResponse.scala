@@ -50,7 +50,10 @@ object QueryResponse {
     }.toList
 
     val namesIndex = columns.zipWithIndex.toMap
-    val records = fields("values").asInstanceOf[JsArray].elements.map(constructRecord(namesIndex, _)).toList
+    val records = if (fields.contains("values"))
+      fields("values").asInstanceOf[JsArray].elements.map(constructRecord(namesIndex, _)).toList
+    else
+      List()
     new Series(seriesName, columns, records)
   }
 

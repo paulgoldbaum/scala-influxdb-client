@@ -9,6 +9,4 @@ protected[influxdbclient] trait DatabaseManagement { self: Database =>
   def drop() = {
     queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
   }
-
-
 }
