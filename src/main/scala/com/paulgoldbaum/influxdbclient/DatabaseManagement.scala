@@ -2,11 +2,10 @@ package com.paulgoldbaum.influxdbclient
 
 protected[influxdbclient] trait DatabaseManagement { self: Database =>
 
-  def create() = {
-    queryWithoutResult("CREATE DATABASE \"" + databaseName + "\"")
-  }
+  def create() =
+    query("CREATE DATABASE \"" + databaseName + "\"")
 
-  def drop() = {
-    queryWithoutResult("DROP DATABASE \"" + databaseName + "\"")
-  }
+  def drop() =
+    query("DROP DATABASE \"" + databaseName + "\"")
+
 }

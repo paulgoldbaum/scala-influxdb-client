@@ -81,4 +81,3 @@ class ErrorResponseException(message: String = null, throwable: Throwable = null
   extends QueryResponseException(message, throwable)
 
 class QueryResponse protected[influxdbclient] (val series: List[Series] = List()) {}
-object EmptyResponse

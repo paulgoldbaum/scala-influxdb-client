@@ -1,16 +1,16 @@
 package com.paulgoldbaum.influxdbclient
 
-protected[influxdbclient] trait UserManagement { self: Client =>
+protected[influxdbclient] trait UserManagement { self: InfluxDB =>
   def createUser(username: String, password: String, isClusterAdmin: Boolean = false) = {
-    var query = "CREATE USER %s WITH PASSWORD '%s'".format(username, password)
+    var queryString = "CREATE USER %s WITH PASSWORD '%s'".format(username, password)
     if (isClusterAdmin)
-      query = query + " WITH ALL PRIVILEGES"
-    queryWithoutResult(query)
+      queryString = queryString + " WITH ALL PRIVILEGES"
+    query(queryString)
   }
 
   def dropUser(username: String) = {
-    val query = "DROP USER " + username
-    queryWithoutResult(query)
+    val queryString = "DROP USER " + username
+    query(queryString)
   }
 
   def showUsers() =

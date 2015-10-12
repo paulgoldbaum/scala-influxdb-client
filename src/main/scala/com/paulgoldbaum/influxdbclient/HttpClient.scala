@@ -1,9 +1,9 @@
 package com.paulgoldbaum.influxdbclient
 
 import com.ning.http.client.Realm.{AuthScheme, RealmBuilder}
-import com.ning.http.client.{AsyncHttpClientConfig, Response, AsyncCompletionHandler, AsyncHttpClient}
+import com.ning.http.client._
 import scala.concurrent.{ExecutionContext, Future, Promise}
-
+import scala.collection.JavaConverters._
 
 protected object HttpClient {
 
@@ -51,9 +51,9 @@ protected class HttpClient(val host: String,
 
   def get(url: String, params: Map[String, String] = Map()): Future[HttpResponse] = {
 
-    var requestBuilder = client.prepareGet("http://%s:%d%s".format(host, port, url))
+    val requestBuilder = client.prepareGet("http://%s:%d%s".format(host, port, url))
       .setRealm(authenticationRealm)
-    params.foreach(param => requestBuilder = requestBuilder.addQueryParam(param._1, param._2))
+    requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
     val resultPromise = Promise[HttpResponse]()
     requestBuilder.execute(new ResponseHandler(resultPromise))
@@ -61,10 +61,10 @@ protected class HttpClient(val host: String,
   }
 
   def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
-    var requestBuilder = client.preparePost("http://%s:%d/%s".format(host, port, url))
+    val requestBuilder = client.preparePost("http://%s:%d%s".format(host, port, url))
       .setRealm(authenticationRealm)
       .setBody(content)
-    params.foreach(param => requestBuilder = requestBuilder.addQueryParam(param._1, param._2))
+    requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
     val resultPromise = Promise[HttpResponse]()
     requestBuilder.execute(new ResponseHandler(resultPromise))

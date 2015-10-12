@@ -11,7 +11,7 @@ protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
     if (default)
       stringBuilder = stringBuilder.append(" DEFAULT")
 
-    queryWithoutResult(stringBuilder.toString())
+    query(stringBuilder.toString())
   }
 
   def showRetentionPolicies() =
@@ -36,7 +36,7 @@ protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
     if (default)
       stringBuilder = stringBuilder.append(" DEFAULT")
 
-    queryWithoutResult(stringBuilder.toString())
+    query(stringBuilder.toString())
   }
 
 }

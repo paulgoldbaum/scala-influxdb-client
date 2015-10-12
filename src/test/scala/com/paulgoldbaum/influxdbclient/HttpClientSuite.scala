@@ -6,9 +6,9 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 
 import com.paulgoldbaum.influxdbclient.HttpClient.Config
-import org.scalatest.BeforeAndAfter
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
-class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
+class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {
 
   var host = "localhost"
   var port = 64011
@@ -21,6 +21,10 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
 
   after {
     mockServer.stop()
+  }
+
+  override def afterAll() = {
+    mockServer.shutdown()
   }
 
   test("Basic requests are received") {

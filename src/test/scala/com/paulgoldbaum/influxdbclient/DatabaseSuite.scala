@@ -60,10 +60,13 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
   }
 
   test("A point can be written with a retention policy parameter") {
+    val retentionPolicyName = "custom_retention_policy"
+    val measurementName = "test_measurement"
+    await(database.createRetentionPolicy(retentionPolicyName, "1w", 1, default = false))
     await(
-      database.write(Point("test_measurement", 11111111).addField("value", 123),
-        retentionPolicy = "default"))
-    val result = await(database.query("SELECT * FROM test_measurement"))
+      database.write(Point(measurementName, 11111111).addField("value", 123),
+        retentionPolicy = retentionPolicyName))
+    val result = await(database.query("SELECT * FROM %s.%s".format(retentionPolicyName, measurementName)))
     assert(result.series.length == 1)
   }
 

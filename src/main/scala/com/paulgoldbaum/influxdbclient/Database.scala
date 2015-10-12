@@ -7,9 +7,10 @@ import scala.concurrent.Future
 
 class Database protected[influxdbclient]
 (val databaseName: String, val httpClient: HttpClient)
-extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagement
+  extends InfluxDB(httpClient)
+  with RetentionPolicyManagement
+  with DatabaseManagement
 {
-
   def write(point: Point,
             precision: Precision = null,
             consistency: Consistency = null,
@@ -17,7 +18,7 @@ extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagemen
   {
     val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
-    httpClient.post("write", params, point.serialize())
+    httpClient.post("/write", params, point.serialize())
       .recover { case error: HttpException => throw exceptionFromStatusCode(error.code, "Error during write", error)}
       .map { result =>
         if (result.code != 204)
@@ -38,9 +39,8 @@ extends Client(httpClient) with RetentionPolicyManagement with DatabaseManagemen
     params.filterNot(_._2 == null).map(r => (r._1, r._2.toString)).toMap
   }
 
-  override protected def getQueryParameters(query: String) = {
-    super.getQueryParameters(query) + ("db" -> databaseName)
-  }
+  override protected def buildQueryParameters(query: String) =
+    Map("q" -> query, "db" -> databaseName)
 
   protected def exceptionFromStatusCode(statusCode: Int, str: String, throwable: Throwable = null): WriteException =
     statusCode match {

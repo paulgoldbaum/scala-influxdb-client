@@ -7,6 +7,6 @@ import scala.concurrent.{Awaitable, Await}
 
 class CustomTestSuite extends FunSuite {
 
-  def await[T](f: Awaitable[T], duration: Duration = 1.second) = Await.result(f, duration)
+  def await[T](f: Awaitable[T], duration: Duration = 2.seconds) = Await.result(f, duration)
 
 }
