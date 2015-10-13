@@ -1,5 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
+import com.paulgoldbaum.influxdbclient.Parameters.Precision.Precision
+
 import scala.concurrent.{Future, ExecutionContext}
 
 object InfluxDB {
@@ -26,12 +28,17 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
       .map(response => response.series.head.points("name").asInstanceOf[List[String]])
   }
 
-  def query(query: String): Future[QueryResult] = {
-    httpClient.get("/query", buildQueryParameters(query))
+  def query(query: String, precision: Precision = null): Future[QueryResult] =
+    httpClient.get("/query", buildQueryParameters(query, precision))
       .map(response => QueryResult.fromJson(response.content))
-  }
 
-  protected def buildQueryParameters(query: String) = Map("q" -> query)
+  protected def buildQueryParameters(query: String, precision: Precision) = {
+    val params = Map("q" -> query)
+    if (precision != null)
+      params + ("precision" -> precision.toString)
+    else
+      params
+  }
 
   protected[influxdbclient] def getHttpClient = httpClient
 

@@ -1,6 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-object WriteParameters {
+object Parameters {
 
   object Precision {
     sealed abstract class Precision(str: String) {

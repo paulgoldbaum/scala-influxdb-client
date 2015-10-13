@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.WriteParameters.Consistency.Consistency
-import com.paulgoldbaum.influxdbclient.WriteParameters.Precision.Precision
+import com.paulgoldbaum.influxdbclient.Parameters.Consistency.Consistency
+import com.paulgoldbaum.influxdbclient.Parameters.Precision.Precision
 
 import scala.concurrent.Future
 
@@ -39,8 +39,8 @@ class Database protected[influxdbclient]
     params.filterNot(_._2 == null).map(r => (r._1, r._2.toString)).toMap
   }
 
-  override protected def buildQueryParameters(query: String) =
-    Map("q" -> query, "db" -> databaseName)
+  override protected def buildQueryParameters(query: String, precision: Precision) =
+    super.buildQueryParameters(query, precision) + ("db" -> databaseName)
 
   protected def exceptionFromStatusCode(statusCode: Int, str: String, throwable: Throwable = null): WriteException =
     statusCode match {

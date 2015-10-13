@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.HttpClient.HttpResponse
-import com.paulgoldbaum.influxdbclient.WriteParameters.{Precision, Consistency}
+import com.paulgoldbaum.influxdbclient.Parameters.{Consistency, Precision}
 import org.scalatest.BeforeAndAfter
 
 import scala.concurrent.Future
@@ -43,11 +43,13 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
     assert(result.series.length == 1)
   }
 
-  test("A point can be written with a precision parameter") {
+  test("A point can be written and read with a precision parameter") {
+    val time = 1444760421270l
     await(
-      database.write(Point("test_measurement", 11111111).addField("value", 123),
-                     precision = Precision.NANOSECONDS))
-    val result = await(database.query("SELECT * FROM test_measurement"))
+      database.write(Point("test_measurement", time).addField("value", 123),
+                     precision = Precision.MILLISECONDS))
+    val result = await(database.query("SELECT * FROM test_measurement", Precision.MILLISECONDS))
+
     assert(result.series.length == 1)
   }
 

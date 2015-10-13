@@ -11,7 +11,7 @@ testOptions in Test += Tests.Argument("-oDF")
 
 libraryDependencies += "com.ning" % "async-http-client" % "1.9.31"
 libraryDependencies += "io.netty" % "netty" % "3.10.4.Final"
-libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
+libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
