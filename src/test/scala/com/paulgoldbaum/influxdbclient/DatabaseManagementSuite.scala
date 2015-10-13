@@ -7,12 +7,10 @@ class DatabaseManagementSuite extends CustomTestSuite {
     val database = influxdb.selectDatabase("_test_database")
 
     await(database.create())
-    var databases = await(database.showDatabases())
-    assert(databases.contains("_test_database"))
+    assert(await(database.exists()))
 
     await(database.drop())
-    databases = await(database.showDatabases())
-    assert(!databases.contains("_test_database"))
+    assert(!await(database.exists()))
   }
 
 }

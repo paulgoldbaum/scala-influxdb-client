@@ -8,4 +8,7 @@ protected[influxdbclient] trait DatabaseManagement { self: Database =>
   def drop() =
     query("DROP DATABASE \"" + databaseName + "\"")
 
+  def exists() =
+    showDatabases().map(_.contains(databaseName))
+
 }
