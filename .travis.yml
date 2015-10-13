@@ -1,11 +1,9 @@
 language: scala
 scala:
   - 2.11.7
-env:
-    - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M -Xmx3072m -Xms3072m"
 
 script:
-  - sbt clean coverage test
+  - sbt -jvm-opts .travis.jvmopts clean coverage test
 
 after_success:
   - codecov
