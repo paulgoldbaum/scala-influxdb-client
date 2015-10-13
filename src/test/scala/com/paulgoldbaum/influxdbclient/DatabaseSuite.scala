@@ -8,7 +8,6 @@ import scala.concurrent.Future
 
 class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
 
-  val influxdb = InfluxDB.connect()
   val database = influxdb.selectDatabase("_test")
 
   before {
@@ -20,7 +19,6 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
   }
 
   test("Writing to a non-existent database throws a DatabaseNotFoundException") {
-    val influxdb = InfluxDB.connect()
     val database = influxdb.selectDatabase("_test_database")
 
     try {
@@ -28,6 +26,8 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
       fail("Exception not thrown")
     } catch {
       case e: DatabaseNotFoundException => // expected
+    } finally {
+      database.drop()
     }
   }
 

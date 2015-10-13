@@ -9,4 +9,6 @@ class CustomTestSuite extends FunSuite {
 
   def await[T](f: Awaitable[T], duration: Duration = 2.seconds) = Await.result(f, duration)
 
+  val influxdb = InfluxDB.connect()
+
 }

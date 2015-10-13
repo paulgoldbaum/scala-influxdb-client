@@ -3,7 +3,6 @@ package com.paulgoldbaum.influxdbclient
 class DatabaseManagementSuite extends CustomTestSuite {
 
   test("A database can be created and dropped") {
-    val influxdb = InfluxDB.connect()
     val database = influxdb.selectDatabase("_test_database")
 
     await(database.create())

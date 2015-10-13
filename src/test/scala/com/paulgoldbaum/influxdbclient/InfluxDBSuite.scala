@@ -3,7 +3,6 @@ package com.paulgoldbaum.influxdbclient
 class InfluxDBSuite extends CustomTestSuite {
 
   test("Asking for a connection returns default parameters") {
-    val influxdb = InfluxDB.connect()
     val httpClient = influxdb.getHttpClient
 
     assert(httpClient.host == "localhost")
