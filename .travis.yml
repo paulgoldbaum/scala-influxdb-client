@@ -4,10 +4,14 @@ scala:
 env:
   - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M"
 
-script: "sbt clean coverage test"
-after_success: "sbt coveralls"
+script:
+  - sbt clean coverage test
+
+after_success:
+  - codecov
 
 before_install:
   - wget https://s3.amazonaws.com/influxdb/influxdb_0.9.4.1_amd64.deb
   - sudo dpkg -i influxdb_0.9.4.1_amd64.deb
   - sudo /etc/init.d/influxdb start
+  - pip install --user codecov
