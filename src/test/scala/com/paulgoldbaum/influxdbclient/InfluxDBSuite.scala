@@ -37,4 +37,9 @@ class InfluxDBSuite extends CustomTestSuite {
     val result = await(client.showDatabases())
     assert(result.contains("_internal"))
   }
+
+  test("Server can be pinged") {
+    val client = new InfluxDB(new HttpClient("localhost", 8086))
+    await(client.ping())
+  }
 }

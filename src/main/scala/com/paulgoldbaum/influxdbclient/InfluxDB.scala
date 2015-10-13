@@ -23,14 +23,17 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
   def selectDatabase(databaseName: String) =
     new Database(databaseName, httpClient)
 
-  def showDatabases(): Future[Seq[String]] = {
+  def showDatabases(): Future[Seq[String]] =
     query("SHOW DATABASES")
       .map(response => response.series.head.points("name").asInstanceOf[List[String]])
-  }
 
-  def query(query: String, precision: Precision = null): Future[QueryResult] =
+  def query(query: String, precision: Precision = null) =
     httpClient.get("/query", buildQueryParameters(query, precision))
       .map(response => QueryResult.fromJson(response.content))
+
+  def ping() =
+    httpClient.get("/ping")
+      .map(response => new QueryResult())
 
   protected def buildQueryParameters(query: String, precision: Precision) = {
     val params = Map("q" -> query)
