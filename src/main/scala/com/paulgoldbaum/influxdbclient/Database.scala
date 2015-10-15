@@ -25,7 +25,6 @@ class Database protected[influxdbclient]
             retentionPolicy: String = null): Future[Boolean] =
   {
     val payload = points.map(_.serialize()).mkString("\n")
-    System.out.println(payload)
     executeWrite(payload, precision, consistency, retentionPolicy)
   }
 
