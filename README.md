@@ -47,7 +47,7 @@ If a write fails, a subclass of `WriteException` will be thrown. This can be han
 error handling in `Futures`, i.e.
 ```scala
 database.write(point)
-  .map(...)
+  // ...
   .recover{ case e: WriteException => ...}
 ```
 
@@ -61,8 +61,8 @@ val points = List(
 )
 database.bulkWrite(points, precision = Precision.MILLISECONDS)
 ```
-*NOTE*: If no timestamps are given, InfluxDB will use the same for all points. If the the measurement name and the tag set
-is also the same, each point will override the previous one.
+**NOTE**: If no timestamps are given, InfluxDB will use the same for all points. If the the measurement name and the tag set
+are also the same, each point will override the previous one.
 
 ### Querying the database
 Given the following data:
