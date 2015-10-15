@@ -37,6 +37,18 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
     assert(result.series.length == 1)
   }
 
+  test("Multiple points can be written and read") {
+    val time = 1444760421000l
+    val points = List(
+      Point("test_measurement", time).addField("value", 123),
+      Point("test_measurement", time + 1).addField("value", 123),
+      Point("test_measurement", time + 2).addField("value", 123)
+    )
+    await(database.bulkWrite(points, precision = Precision.MILLISECONDS))
+    val result = await(database.query("SELECT * FROM test_measurement"))
+    assert(result.series.head.records.length == 3)
+  }
+
   test("A point can be written with tags") {
     await(database.write(Point("test_measurement").addField("value", 123).addTag("tag_key", "tag_value")))
     val result = await(database.query("SELECT * FROM test_measurement WHERE tag_key='tag_value'"))

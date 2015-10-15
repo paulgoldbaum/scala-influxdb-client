@@ -16,9 +16,23 @@ class Database protected[influxdbclient]
             consistency: Consistency = null,
             retentionPolicy: String = null): Future[Boolean] =
   {
+    executeWrite(point.serialize(), precision, consistency, retentionPolicy)
+  }
+
+  def bulkWrite(points: List[Point],
+            precision: Precision = null,
+            consistency: Consistency = null,
+            retentionPolicy: String = null): Future[Boolean] =
+  {
+    val payload = points.map(_.serialize()).mkString("\n")
+    System.out.println(payload)
+    executeWrite(payload, precision, consistency, retentionPolicy)
+  }
+
+  def executeWrite(payload: String, precision: Precision, consistency: Consistency, retentionPolicy: String) = {
     val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
-    httpClient.post("/write", params, point.serialize())
+    httpClient.post("/write", params, payload)
       .recover { case error: HttpException => throw exceptionFromStatusCode(error.code, "Error during write", error)}
       .map { result =>
         if (result.code != 204)

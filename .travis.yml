@@ -1,9 +1,10 @@
 language: scala
 scala:
   - 2.11.7
+  - 2.10.6
 
 script:
-  - sbt -jvm-opts .travis.jvmopts clean coverage test
+  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis.jvmopts clean coverage test
 
 after_success:
   - codecov
