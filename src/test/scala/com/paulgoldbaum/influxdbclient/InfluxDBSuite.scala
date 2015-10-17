@@ -2,11 +2,10 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Mocks.ExceptionThrowingHttpClient
 
-import scala.concurrent.Await
-
 class InfluxDBSuite extends CustomTestSuite {
 
   test("Asking for a connection returns default parameters") {
+    val influxdb = InfluxDB.connect()
     val httpClient = influxdb.getHttpClient
 
     assert(httpClient.host == "localhost")
@@ -36,14 +35,12 @@ class InfluxDBSuite extends CustomTestSuite {
   }
 
   test("Shows existing databases") {
-    val client = new InfluxDB(new HttpClient("localhost", 8086))
-    val result = await(client.showDatabases())
+    val result = await(influxdb.showDatabases())
     assert(result.contains("_internal"))
   }
 
   test("Server can be pinged") {
-    val client = new InfluxDB(new HttpClient("localhost", 8086))
-    await(client.ping())
+    await(influxdb.ping())
   }
 
   test("If an error happens during a ping a PingException is thrown") {

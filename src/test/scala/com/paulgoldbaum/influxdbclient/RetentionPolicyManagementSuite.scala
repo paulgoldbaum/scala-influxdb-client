@@ -4,7 +4,7 @@ import org.scalatest.BeforeAndAfter
 
 class RetentionPolicyManagementSuite extends CustomTestSuite with BeforeAndAfter {
 
-  var database = new Database("_test_database_rp", new HttpClient("localhost", 8086))
+  var database = new Database("_test_database_rp", new HttpClient("localhost", 8086, databaseUsername, databasePassword))
   before {
     await(database.create())
   }
