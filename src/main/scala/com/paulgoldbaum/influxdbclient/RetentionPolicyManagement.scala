@@ -3,9 +3,9 @@ package com.paulgoldbaum.influxdbclient
 protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
   def createRetentionPolicy(name: String, duration: String, replication: Int, default: Boolean) = {
     var stringBuilder = new StringBuilder()
-      .append("CREATE RETENTION POLICY ").append(name)
-      .append(" ON ").append(databaseName)
-      .append(" DURATION ").append(duration)
+      .append("CREATE RETENTION POLICY \"").append(name)
+      .append("\" ON \"").append(databaseName)
+      .append("\" DURATION ").append(duration)
       .append(" REPLICATION ").append(replication)
 
     if (default)
@@ -15,18 +15,18 @@ protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
   }
 
   def showRetentionPolicies() =
-    query("SHOW RETENTION POLICIES ON " + databaseName)
+    query("SHOW RETENTION POLICIES ON \"%s\"".format(databaseName))
 
   def dropRetentionPolicy(name: String) =
-    query("DROP RETENTION POLICY " + name + " ON " + databaseName)
+    query("DROP RETENTION POLICY \"%s\" ON \"%s\"".format(name, databaseName))
 
   def alterRetentionPolicy(name: String, duration: String = null, replication: Int = -1, default: Boolean = false) = {
     if (duration == null && replication == -1 && !default)
       throw new InvalidRetentionPolicyParametersException("At least one parameter has to be set")
 
     var stringBuilder = new StringBuilder()
-      .append("ALTER RETENTION POLICY ").append(name)
-      .append(" ON ").append(databaseName)
+      .append("ALTER RETENTION POLICY \"").append(name)
+      .append("\" ON \"").append(databaseName).append("\"")
     if (duration != null)
       stringBuilder = stringBuilder.append(" DURATION ").append(duration)
 
