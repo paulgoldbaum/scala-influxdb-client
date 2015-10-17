@@ -14,7 +14,8 @@ val influxdb = InfluxDB.connect("localhost", 8086)
 ```
 
 ## Usage
-All methods are non-blocking and return a `Future`, in most cases a `Future[QueryResponse]` which might be empty if the action does not return a result.
+All methods are non-blocking and return a `Future`, in most cases a `Future[QueryResponse]` which might be empty if 
+the action does not return a result.
 
 ### Working with databases
 ```scala
@@ -43,8 +44,8 @@ database.write(point,
 ```
 If no precision parameter is given, InfluxDB assumes timestamps to be in nanoseconds.
 
-If a write fails, a subclass of `WriteException` will be thrown. This can be handled through the usual methods of 
-error handling in `Futures`, i.e.
+If a write fails, it's future will fail with a subclass of `WriteException`. This can be handled through the usual
+methods of error handling in `Futures`, i.e.
 ```scala
 database.write(point)
   // ...
@@ -64,6 +65,8 @@ database.bulkWrite(points, precision = Precision.MILLISECONDS)
 **NOTE**: If no timestamps are given, InfluxDB will use the same for all points. If the the measurement name and the tag set
 are also the same, each point will override the previous one.
 
+Errors during queries return a `QueryException`.
+
 ### Querying the database
 Given the following data:
 ```
@@ -77,7 +80,7 @@ time                            host     region   value
 ```scala
 database.query("SELECT * FROM cpu")
 ```
-This returns a Future[QueryResult]. To access the list of records use
+This returns a `Future[QueryResult]`. To access the list of records use
 ```scala
 result.series.head.records
 ```

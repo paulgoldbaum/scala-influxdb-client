@@ -66,7 +66,7 @@ class Database protected[influxdbclient]
 }
 
 
-abstract class WriteException(str: String, throwable: Throwable = null) extends Exception(str, throwable)
+abstract class WriteException(str: String, throwable: Throwable = null) extends InfluxDBException(str, throwable)
 class DatabaseNotFoundException(str: String, throwable: Throwable) extends WriteException(str, throwable)
 class MalformedRequestException(str: String, throwable: Throwable) extends WriteException(str, throwable)
 class RequestNotCompletedException(str: String, throwable: Throwable) extends WriteException(str, throwable)

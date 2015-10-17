@@ -1,10 +1,8 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.HttpClient.HttpResponse
+import com.paulgoldbaum.influxdbclient.Mocks.{ExceptionThrowingHttpClient, ErrorReturningHttpClient}
 import com.paulgoldbaum.influxdbclient.Parameters.{Consistency, Precision}
 import org.scalatest.BeforeAndAfter
-
-import scala.concurrent.Future
 
 class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
 
@@ -136,16 +134,5 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
     }
   }
 
-  class ExceptionThrowingHttpClient(host: String, port: Int) extends HttpClient(host, port) {
-    override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
-      Future.failed(new HttpException(""))
-    }
-  }
-
-  class ErrorReturningHttpClient(host: String, port: Int, errorCode: Int) extends HttpClient(host, port) {
-    override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
-      Future.successful(new HttpResponse(errorCode, "Error message"))
-    }
-  }
 }
 
