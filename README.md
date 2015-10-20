@@ -6,6 +6,12 @@ scala-influxdb-client
 
 Asynchronous library for accessing InfluxDB from Scala.
 
+## Installation
+Add the following to your `build.sbt`
+```scala
+libraryDependencies += "com.paulgoldbaum" %% "scala-influxdb-client" % "0.2.1"
+```
+
 ## Connecting
 ```scala
 import com.paulgoldbaum.influxdbclient._
