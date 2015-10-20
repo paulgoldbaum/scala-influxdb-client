@@ -6,14 +6,18 @@ import scala.concurrent.{Future, ExecutionContext}
 
 object InfluxDB {
 
- def connect(host: String = "localhost",
-             port: Int = 8086,
-             username: String = null,
-             password: String = null): InfluxDB =
- {
-   val httpClient = new HttpClient(host, port, username, password)
-   new InfluxDB(httpClient)
- }
+  def connect(host: String = "localhost",
+              port: Int = 8086,
+              username: String = null,
+              password: String = null): InfluxDB =
+  {
+     val httpClient = new HttpClient(host, port, username, password)
+     new InfluxDB(httpClient)
+  }
+
+  def udpConnect(host: String, port: Int) = {
+    new UdpClient(host, port)
+  }
 }
 
 class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object with UserManagement {
