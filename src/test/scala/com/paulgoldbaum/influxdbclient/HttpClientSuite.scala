@@ -12,7 +12,7 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
 
   var host = "localhost"
   var port = 64011
-  var mockServer: WireMockServer = new WireMockServer(wireMockConfig().port(port))
+  var mockServer: WireMockServer = new WireMockServer(wireMockConfig().port(port).containerThreads(5).jettyAcceptors(1))
 
   before {
     mockServer.start()
