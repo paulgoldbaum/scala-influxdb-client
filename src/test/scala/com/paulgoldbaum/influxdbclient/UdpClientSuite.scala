@@ -26,4 +26,19 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
     assert(result.series.head.records.head("value") == 123)
   }
 
+  test("Points can be written in bulk") {
+    val udpClient = InfluxDB.udpConnect("localhost", 8086)
+    val timestamp = System.currentTimeMillis()
+    udpClient.write(List(
+      Point("test_measurement", timestamp).addField("value", 1).addTag("tag_key", "tag_value"),
+      Point("test_measurement", timestamp + 1).addField("value", 2).addTag("tag_key", "tag_value"),
+      Point("test_measurement", timestamp + 2).addField("value", 3).addTag("tag_key", "tag_value")
+    ))
+    Thread.sleep(5) // to allow flushing to happen inside influx
+
+    val database = influxdb.selectDatabase(databaseName)
+    val result = await(database.query("SELECT * FROM test_measurement"))
+    assert(result.series.head.records.length == 3)
+  }
+
 }

@@ -8,9 +8,15 @@ class UdpClient protected[influxdbclient](host: String, port: Int) {
   val address = new InetSocketAddress(host, port)
 
   def write(point: Point) = {
-    val payload = point.serialize().getBytes
+    send(point.serialize().getBytes)
+  }
+
+  def write(points: List[Point]) = {
+    send(points.map(_.serialize()).mkString("\n").getBytes)
+  }
+
+  private def send(payload: Array[Byte]) = {
     val packet = new DatagramPacket(payload, payload.length, address)
     socket.send(packet)
   }
-
 }
