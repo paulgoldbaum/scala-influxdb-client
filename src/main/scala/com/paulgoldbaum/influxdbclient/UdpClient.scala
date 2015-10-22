@@ -11,7 +11,7 @@ class UdpClient protected[influxdbclient](host: String, port: Int) {
     send(point.serialize().getBytes)
   }
 
-  def write(points: List[Point]) = {
+  def bulkWrite(points: List[Point]) = {
     send(points.map(_.serialize()).mkString("\n").getBytes)
   }
 

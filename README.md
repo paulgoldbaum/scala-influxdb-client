@@ -125,3 +125,21 @@ database.showRetentionPolicies()
 database.dropRetentionPolicy(name)
 database.alterRetentionPolicy(name, duration, replication, default)
 ```
+
+### Writing over UDP
+```scala
+import com.paulgoldbaum.influxdbclient._
+
+val udpClient = InfluxDB.udpConnect("localhost", 8086)
+val point = Point("cpu", System.currentTimeMillis())
+udpClient.write(point)
+```
+Points can also be written in bulk
+```scala
+val points = List(
+  Point("test_measurement", time).addField("value", 123),
+  Point("test_measurement", time + 1).addField("value", 123),
+  Point("test_measurement", time + 2).addField("value", 123)
+)
+udpClient.bulkWrite(points)
+```
