@@ -31,8 +31,8 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
     val timestamp = System.currentTimeMillis()
     udpClient.bulkWrite(List(
       Point("test_measurement", timestamp).addField("value", 1).addTag("tag_key", "tag_value"),
-      Point("test_measurement1", timestamp).addField("value", 2).addTag("tag_key", "tag_value"),
-      Point("test_measurement2", timestamp + 2).addField("value", 3).addTag("tag_key", "tag_value")
+      Point("test_measurement", timestamp + 1).addField("value", 2).addTag("tag_key", "tag_value"),
+      Point("test_measurement", timestamp + 2).addField("value", 3).addTag("tag_key", "tag_value")
     ))
     Thread.sleep(50) // to allow flushing to happen inside influx
 
