@@ -2,22 +2,26 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Mocks.{ExceptionThrowingHttpClient, ErrorReturningHttpClient}
 import com.paulgoldbaum.influxdbclient.Parameters.{Consistency, Precision}
-import org.scalatest.BeforeAndAfter
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
-class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
+class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {
 
-  val database = influxdb.selectDatabase("_test")
+  val database = influxdb.selectDatabase("_test_database_db")
 
   before {
+    try {
+      await(database.drop())
+    } catch {
+      case e: ErrorResponseException => //ignore
+    }
     await(database.create())
   }
 
-  after {
+  override def afterAll() =
     await(database.drop())
-  }
 
   test("Writing to a non-existent database throws a DatabaseNotFoundException") {
-    val database = influxdb.selectDatabase("_test_database")
+    val database = influxdb.selectDatabase("_test_database_db_2")
 
     try {
       await(database.write(Point("test_measurement").addField("value", 123)))
