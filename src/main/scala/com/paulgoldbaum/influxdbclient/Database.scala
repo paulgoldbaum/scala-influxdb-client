@@ -28,7 +28,7 @@ class Database protected[influxdbclient]
     executeWrite(payload, precision, consistency, retentionPolicy)
   }
 
-  def executeWrite(payload: String, precision: Precision, consistency: Consistency, retentionPolicy: String) = {
+  private def executeWrite(payload: String, precision: Precision, consistency: Consistency, retentionPolicy: String) = {
     val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
     httpClient.post("/write", params, payload)
