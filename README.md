@@ -20,8 +20,8 @@ val influxdb = InfluxDB.connect("localhost", 8086)
 ```
 
 ## Usage
-All methods are non-blocking and return a `Future`, in most cases a `Future[QueryResponse]` which might be empty if 
-the action does not return a result.
+All methods are non-blocking and return a `Future`; in most cases a `Future[QueryResponse]` which might be empty if
+the action does not return a result. Failing `Futures` carry a subclass of `InfluxDBException`
 
 ### Working with databases
 ```scala
@@ -50,7 +50,7 @@ database.write(point,
 ```
 If no precision parameter is given, InfluxDB assumes timestamps to be in nanoseconds.
 
-If a write fails, it's future will fail with a subclass of `WriteException`. This can be handled through the usual
+If a write fails, it's future will contain a subclass of `WriteException`. This can be handled through the usual
 methods of error handling in `Futures`, i.e.
 ```scala
 database.write(point)
@@ -58,19 +58,15 @@ database.write(point)
   .recover{ case e: WriteException => ...}
 ```
 
-Multiple points can be written in one operation using the bulkWrite method
+Multiple points can be written in one operation by using the bulkWrite operation
 ```scala
-val time = System.currentTimeMillis()
 val points = List(
-  Point("test_measurement", time).addField("value", 123),
-  Point("test_measurement", time + 1).addField("value", 123),
-  Point("test_measurement", time + 2).addField("value", 123)
+  Point("test_measurement1").addField("value1", 123),
+  Point("test_measurement2").addField("value2", 123),
+  Point("test_measurement3").addField("value3", 123)
 )
 database.bulkWrite(points, precision = Precision.MILLISECONDS)
 ```
-**NOTE**: If no timestamps are given, InfluxDB will use the same for all points. If the the measurement name and the tag set
-are also the same, each point will override the previous one.
-
 Errors during queries return a `QueryException`.
 
 ### Querying the database
@@ -90,7 +86,7 @@ This returns a `Future[QueryResult]`. To access the list of records use
 ```scala
 result.series.head.records
 ```
-which we can iterate and access the different fields
+which we can iterate to access the different fields
 ```scala
 result.series.head.records.foreach(record => record("host"))
 ```
@@ -99,9 +95,9 @@ If we are only interested in the "value" field of each record
 ```scala
 result.series.head.points("value")
 ```
-returns a list of just the value field of each record.
+returns a list of just the `value` field of each record.
 
-The column names can be accessed through
+The list of column names can be accessed through
 ```scala
 result.series.head.columns
 ```
@@ -126,6 +122,8 @@ database.dropRetentionPolicy(name)
 database.alterRetentionPolicy(name, duration, replication, default)
 ```
 
+*NOTE*: User and retention policy management primitives return an empty `QueryResult` or fail with a `QueryException` in case of an error.
+
 ### Writing over UDP
 ```scala
 import com.paulgoldbaum.influxdbclient._
@@ -137,9 +135,9 @@ udpClient.write(point)
 Points can also be written in bulk
 ```scala
 val points = List(
-  Point("test_measurement", time).addField("value", 123),
-  Point("test_measurement", time + 1).addField("value", 123),
-  Point("test_measurement", time + 2).addField("value", 123)
+  Point("test_measurement1").addField("value1", 123),
+  Point("test_measurement2").addField("value2", 123),
+  Point("test_measurement3").addField("value3", 123)
 )
 udpClient.bulkWrite(points)
 ```
