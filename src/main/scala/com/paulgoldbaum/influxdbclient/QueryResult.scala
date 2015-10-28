@@ -9,7 +9,7 @@ class Record protected[influxdbclient]
 }
 
 class Series protected[influxdbclient]
-(val name: String, val columns: List[String], val records: List[Record]) {
+(val name: String, val columns: List[String], val records: List[Record], val tags: Map[String, Any] = Map.empty[String, Any]) {
   def points(column: String) = records.map(_(column))
   def points(column: Int) = records.map(_(column))
 }
@@ -49,12 +49,25 @@ object QueryResult {
       case t => throw new MalformedResponseException("Found invalid type " + t.toString())
     }.toList
 
+    var tags = Map.empty[String, Any]
+    if (fields.keySet.contains("tags")) {
+      tags = fields("tags").asJsObject.fields.map {
+        case (key: String, value: JsValue) =>
+          value match {
+            case JsNumber(num) => (key, num)
+            case JsString(str) => (key, str)
+            case JsBoolean(boolean) => (key, boolean)
+          }
+        case t => throw new MalformedResponseException("Found invalid type " + t.toString())
+      }
+    }
+
     val namesIndex = columns.zipWithIndex.toMap
     val records = if (fields.contains("values"))
       fields("values").asInstanceOf[JsArray].elements.map(constructRecord(namesIndex, _)).toList
     else
       List()
-    new Series(seriesName, columns, records)
+    new Series(seriesName, columns, records, tags)
   }
 
   protected[influxdbclient]
