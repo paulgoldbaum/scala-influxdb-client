@@ -84,11 +84,24 @@ class QueryResultSuite extends CustomTestSuite {
     assert(series.points(1) == List(2, 3, 4, 5))
   }
 
-  test("Tags can be accessed by name") {
+  test("Tags can be accessed by name and position") {
     val data = JsonParser("""{"columns":["column1", "column2", "column3"],"values":[["value1", 2, true]],"tags":{"tag": "value"}}""")
     val series = QueryResult.constructSeries(data)
 
-    assert(series.tags("tag").toString == "value")
+    assert(series.tags("tag") == "value")
+    assert(series.tags(0) == "value")
+  }
+
+  test("Tags can be defined as strings, numbers or booleans") {
+    val data = JsonParser("""{"columns":["column1", "column2", "column3"],"values":[["value1", 2, true]],"tags":{"tag1": "value", "tag2": 10, "tag3": true}}""")
+    val series = QueryResult.constructSeries(data)
+
+    assert(series.tags("tag1") == "value")
+    assert(series.tags(0) == "value")
+    assert(series.tags("tag2") == 10)
+    assert(series.tags(1) == 10)
+    assert(series.tags("tag3") == true)
+    assert(series.tags(2) == true)
   }
 
   test("Valid error responses throws an ErrorResponseException") {
