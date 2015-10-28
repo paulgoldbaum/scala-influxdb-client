@@ -8,8 +8,15 @@ class Record protected[influxdbclient]
   def apply(name: String) = values(namesIndex(name))
 }
 
+class TagSet protected[influxdbclient]
+(tagsIndex: Map[String, Int], values: List[Any]) {
+  def apply(position: Int) = values(position)
+  def apply(name: String) = values(tagsIndex(name))
+  def size: Int = tagsIndex.size
+}
+
 class Series protected[influxdbclient]
-(val name: String, val columns: List[String], val records: List[Record]) {
+(val name: String, val columns: List[String], val records: List[Record], val tags: TagSet) {
   def points(column: String) = records.map(_(column))
   def points(column: Int) = records.map(_(column))
 }
@@ -49,12 +56,22 @@ object QueryResult {
       case t => throw new MalformedResponseException("Found invalid type " + t.toString())
     }.toList
 
+    val tagsIndex = if (fields.contains("tags"))
+      fields("tags").asJsObject.fields.keySet.zipWithIndex.toMap
+    else
+      Map.empty[String, Int]
+
+    val tags = if (fields.contains("tags"))
+      constructTagSet(tagsIndex, fields("tags"))
+    else
+      constructTagSet(Map.empty[String, Int], JsObject.empty)
+
     val namesIndex = columns.zipWithIndex.toMap
     val records = if (fields.contains("values"))
       fields("values").asInstanceOf[JsArray].elements.map(constructRecord(namesIndex, _)).toList
     else
       List()
-    new Series(seriesName, columns, records)
+    new Series(seriesName, columns, records, tags)
   }
 
   protected[influxdbclient]
@@ -68,6 +85,18 @@ object QueryResult {
     }.toList
 
     new Record(namesIndex, values)
+  }
+
+  protected[influxdbclient]
+  def constructTagSet(tagsIndex: Map[String, Int], value: JsValue): TagSet = {
+    val values = value.asJsObject.fields.map {
+      case (key: String, JsNumber(num)) => num
+      case (key: String, JsString(str)) => str
+      case (key: String, JsBoolean(boolean)) => boolean
+      case t => throw new MalformedResponseException("Found invalid type " + t.toString())
+    }.toList
+
+    new TagSet(tagsIndex, values)
   }
 }
 
