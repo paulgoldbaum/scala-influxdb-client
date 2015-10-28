@@ -74,6 +74,16 @@ class QueryResultSuite extends CustomTestSuite {
     }
   }
 
+  test("Constructing a series with unsupported tag types throws a MalformedResponseException") {
+    try {
+      val data = JsonParser("""{"name":"test_series","columns":["columns1"],"values":[["value1"]],"tags": {"tag": []}}""")
+      val series = QueryResult.constructSeries(data)
+      fail("Exception not thrown")
+    } catch {
+      case e: MalformedResponseException =>
+    }
+  }
+
   test("Value series can be accessed by name and position") {
     val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
     val series = QueryResult.constructSeries(data)
