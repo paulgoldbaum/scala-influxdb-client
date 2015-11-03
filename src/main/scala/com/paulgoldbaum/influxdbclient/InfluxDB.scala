@@ -1,6 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.Parameters.Precision.Precision
+import com.paulgoldbaum.influxdbclient.Parameter.Precision.Precision
 
 import scala.concurrent.{Future, ExecutionContext}
 

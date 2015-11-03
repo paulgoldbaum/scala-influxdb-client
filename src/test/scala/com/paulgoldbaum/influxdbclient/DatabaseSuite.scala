@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Mocks.{ExceptionThrowingHttpClient, ErrorReturningHttpClient}
-import com.paulgoldbaum.influxdbclient.Parameters.{Consistency, Precision}
+import com.paulgoldbaum.influxdbclient.Parameter.{Consistency, Precision}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
 class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {

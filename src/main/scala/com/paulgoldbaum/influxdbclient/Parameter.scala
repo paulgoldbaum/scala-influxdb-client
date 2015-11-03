@@ -1,6 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
-object Parameters {
+object Parameter {
 
   object Precision {
     sealed abstract class Precision(str: String) {

@@ -1,12 +1,12 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.Parameters.Consistency.Consistency
-import com.paulgoldbaum.influxdbclient.Parameters.Precision.Precision
+import com.paulgoldbaum.influxdbclient.Parameter.Consistency.Consistency
+import com.paulgoldbaum.influxdbclient.Parameter.Precision.Precision
 
 import scala.concurrent.Future
 
 class Database protected[influxdbclient]
-(val databaseName: String, val httpClient: HttpClient)
+(val databaseName: String, httpClient: HttpClient)
   extends InfluxDB(httpClient)
   with RetentionPolicyManagement
   with DatabaseManagement
