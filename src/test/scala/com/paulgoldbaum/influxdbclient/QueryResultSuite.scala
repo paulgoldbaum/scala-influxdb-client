@@ -20,6 +20,13 @@ class QueryResultSuite extends CustomTestSuite {
     assert(record("second_metric") == "second value")
   }
 
+  test("Null values are supported") {
+    val data = JsonParser("""[1, null]""")
+    val record = QueryResult.constructRecord(Map("first_metric" -> 0, "second_metric" -> 1), data)
+    assert(record(1) == null)
+    assert(record("second_metric") == null)
+  }
+
   test("Constructing a record with unsupported types throws a MalformedResponseException") {
     try {
       val data = JsonParser( """[{}, "second value"]""")

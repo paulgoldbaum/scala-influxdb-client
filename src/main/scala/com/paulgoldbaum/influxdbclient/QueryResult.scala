@@ -81,6 +81,7 @@ object QueryResult {
       case JsNumber(num) => num
       case JsString(str) => str
       case JsBoolean(boolean) => boolean
+      case JsNull => null
       case t => throw new MalformedResponseException("Found invalid type " + t.toString())
     }.toList
 
