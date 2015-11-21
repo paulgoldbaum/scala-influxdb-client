@@ -10,9 +10,9 @@ after_success:
   - codecov
 
 before_install:
-  - wget https://s3.amazonaws.com/influxdb/influxdb_0.9.4.2_amd64.deb
-  - sudo dpkg -i influxdb_0.9.4.2_amd64.deb
-  - sudo cp src/test/resources/influxdb.conf /etc/opt/influxdb/influxdb.conf
+  - wget https://s3.amazonaws.com/influxdb/influxdb_0.9.5_amd64.deb
+  - sudo dpkg -i influxdb_0.9.5_amd64.deb
+  - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
   - sudo service influxdb start
-  - sleep 5; /opt/influxdb/influx --execute "CREATE USER influx_user WITH PASSWORD 'influx_password' WITH ALL PRIVILEGES"
+  - sleep 5; /usr/bin/influx --execute "CREATE USER influx_user WITH PASSWORD 'influx_password' WITH ALL PRIVILEGES"
   - pip install --user codecov
