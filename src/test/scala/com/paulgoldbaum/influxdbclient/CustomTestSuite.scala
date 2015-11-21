@@ -13,6 +13,6 @@ class CustomTestSuite extends FunSuite {
 
   def await[T](f: Awaitable[T], duration: Duration = waitDuration) = Await.result(f, duration)
 
-  val influxdb = InfluxDB.connect("localhost", 8086, false, databaseUsername, databasePassword)
+  val influxdb = InfluxDB.connect("localhost", 8086, databaseUsername, databasePassword, false)
 
 }

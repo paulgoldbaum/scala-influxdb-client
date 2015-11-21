@@ -7,11 +7,11 @@ import scala.concurrent.{Future, ExecutionContext}
 object InfluxDB {
 
   def connect(host: String = "localhost",
-             port: Int = 8086,
-             https: Boolean = false,
-             username: String = null,
-             password: String = null,
-             httpConfig: HttpConfig = null): InfluxDB =
+              port: Int = 8086,
+              username: String = null,
+              password: String = null,
+              https: Boolean = false,
+              httpConfig: HttpConfig = null): InfluxDB =
   {
      val httpClient = new HttpClient(host, port, https, username, password, httpConfig)
      new InfluxDB(httpClient)
