@@ -4,7 +4,7 @@ import org.scalatest.BeforeAndAfter
 
 class RetentionPolicyManagementSuite extends CustomTestSuite with BeforeAndAfter {
 
-  val database = new Database("_test_database_rp", new HttpClient("localhost", 8086, databaseUsername, databasePassword))
+  val database = new Database("_test_database_rp", new HttpClient("localhost", 8086, false, databaseUsername, databasePassword))
   val retentionPolicyName = "test_retention_policy"
 
   before {

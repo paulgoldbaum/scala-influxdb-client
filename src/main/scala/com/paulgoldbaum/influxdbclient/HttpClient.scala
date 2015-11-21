@@ -5,53 +5,27 @@ import com.ning.http.client._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.collection.JavaConverters._
 
-protected object HttpClient {
-
-  case class HttpResponse(code: Int, content: String)
-
-  case class HttpJsonResponse(code: Int, content: Map[String, Object])
-
-  class Config {
-    private var builder = new AsyncHttpClientConfig.Builder
-
-    def setConnectTimeout(timeout: Int) = {
-      builder = builder.setConnectTimeout(timeout)
-      this
-    }
-
-    def setReadTimeout(timeout: Int) = {
-      builder = builder.setReadTimeout(timeout)
-      this
-    }
-
-    def setRequestTimeout(timeout: Int) = {
-      builder = builder.setRequestTimeout(timeout)
-      this
-    }
-
-    protected[influxdbclient] def build() = builder.build()
-  }
-}
-
 protected class HttpClient(val host: String,
-                 val port: Int,
-                 val username: String = null,
-                 val password: String = null,
-                 val clientConfig: HttpClient.Config = null)
+                          val port: Int,
+                          val https: Boolean = false,
+                          val username: String = null,
+                          val password: String = null,
+                          val clientConfig: HttpConfig = null)
 {
-  import HttpClient._
 
-  implicit val ec = ExecutionContext.global
-  val authenticationRealm = makeAuthenticationRealm()
+  implicit private val ec = ExecutionContext.global
+  private val authenticationRealm = makeAuthenticationRealm()
 
-  val client: AsyncHttpClient = if (clientConfig == null)
+  private val client: AsyncHttpClient = if (clientConfig == null)
     new AsyncHttpClient()
   else
     new AsyncHttpClient(clientConfig.build())
 
+  private val protocol = if (https) "https" else "http"
+
   def get(url: String, params: Map[String, String] = Map()): Future[HttpResponse] = {
 
-    val requestBuilder = client.prepareGet("http://%s:%d%s".format(host, port, url))
+    val requestBuilder = client.prepareGet("%s://%s:%d%s".format(protocol, host, port, url))
       .setRealm(authenticationRealm)
     requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
@@ -61,7 +35,7 @@ protected class HttpClient(val host: String,
   }
 
   def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
-    val requestBuilder = client.preparePost("http://%s:%d%s".format(host, port, url))
+    val requestBuilder = client.preparePost("%s://%s:%d%s".format(protocol, host, port, url))
       .setRealm(authenticationRealm)
       .setBody(content)
     requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
@@ -100,3 +74,7 @@ protected class HttpClient(val host: String,
 
 class HttpException protected[influxdbclient]
 (val str: String, val code: Int = -1, val throwable: Throwable = null) extends Exception(str, throwable) {}
+
+case class HttpResponse(code: Int, content: String)
+
+case class HttpJsonResponse(code: Int, content: Map[String, Object])

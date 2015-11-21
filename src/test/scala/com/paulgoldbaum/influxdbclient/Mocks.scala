@@ -1,7 +1,5 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.paulgoldbaum.influxdbclient.HttpClient.HttpResponse
-
 import scala.concurrent.Future
 
 object Mocks {

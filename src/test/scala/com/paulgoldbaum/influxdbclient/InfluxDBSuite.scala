@@ -30,7 +30,7 @@ class InfluxDBSuite extends CustomTestSuite {
   }
 
   test("Returns correct database") {
-    val database = new InfluxDB(new HttpClient("", 1, "", "")).selectDatabase("test_database")
+    val database = new InfluxDB(new HttpClient("", 1, false, "", "")).selectDatabase("test_database")
     assert(database.databaseName == "test_database")
   }
 

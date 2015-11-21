@@ -5,14 +5,16 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 
-import com.paulgoldbaum.influxdbclient.HttpClient.Config
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
 class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {
 
   var host = "localhost"
   var port = 64011
-  var mockServer: WireMockServer = new WireMockServer(wireMockConfig().port(port).containerThreads(5).jettyAcceptors(1))
+  var httpsPort = 64012
+  var mockServer: WireMockServer = new WireMockServer(
+    wireMockConfig().port(port).containerThreads(5).jettyAcceptors(1).httpsPort(httpsPort)
+  )
 
   before {
     mockServer.start()
@@ -31,6 +33,16 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
     val url = "/query"
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(200).withBody("")))
     val client = new HttpClient(host, port)
+    val future = client.get(url)
+    val result = await(future)
+    assert(result.code == 200)
+  }
+
+  test("Https requests are received") {
+    val url = "/query"
+    stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(200).withBody("")))
+    val config = new HttpConfig().setAcceptAnyCertificate(true)
+    val client = new HttpClient(host, httpsPort, true, null, null, config)
     val future = client.get(url)
     val result = await(future)
     assert(result.code == 200)
@@ -55,8 +67,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
   }
 
   test("Future fails on connection refused") {
-    val config = new Config()
-    val client = new HttpClient(host, port + 1, null, null, config)
+    val config = new HttpConfig()
+    val client = new HttpClient(host, port - 1, false, null, null, config)
 
     try {
       await(client.get("/query"))
@@ -75,8 +87,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
           .withStatus(200)
           .withBody("")))
 
-    val config = new Config().setRequestTimeout(50)
-    val client = new HttpClient(host, port, null, null, config)
+    val config = new HttpConfig().setRequestTimeout(50)
+    val client = new HttpClient(host, port, false, null, null, config)
 
     try {
       await(client.get(url))
@@ -95,8 +107,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
           .withStatus(200)
           .withBody("")))
 
-    val config = new Config().setReadTimeout(50)
-    val client = new HttpClient(host, port, null, null, config)
+    val config = new HttpConfig().setReadTimeout(50)
+    val client = new HttpClient(host, port, false, null, null, config)
 
     try {
       await(client.get(url))
@@ -109,8 +121,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
   test("Future fails if the connection takes too long to establish") {
     val url = "/query"
 
-    val config = new Config().setConnectTimeout(50)
-    val client = new HttpClient("192.0.2.1", port, null, null, config)
+    val config = new HttpConfig().setConnectTimeout(50)
+    val client = new HttpClient("192.0.2.1", port, false, null, null, config)
 
     try {
       await(client.get(url))
