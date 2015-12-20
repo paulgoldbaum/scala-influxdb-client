@@ -86,8 +86,7 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAf
     assert(result.series.length == 1)
   }
 
-  ignore("Writing to a non-existent retention policy throws an error") {
-    // Makes influxdb explode. https://github.com/influxdb/influxdb/issues/4318
+  test("Writing to a non-existent retention policy throws an error") {
     try {
       await(
         database.write(Point("test_measurement", 11111111).addField("value", 123),
