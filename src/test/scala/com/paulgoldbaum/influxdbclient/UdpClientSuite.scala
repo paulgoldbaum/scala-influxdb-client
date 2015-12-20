@@ -8,9 +8,7 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
   val database = influxdb.selectDatabase(databaseName)
 
   before {
-    val exists = await(database.exists())
-    if (!exists)
-      await(database.create())
+    await(database.create(true))
   }
 
   after {
