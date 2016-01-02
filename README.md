@@ -67,7 +67,6 @@ val points = List(
 )
 database.bulkWrite(points, precision = Precision.MILLISECONDS)
 ```
-Errors during queries return a `QueryException`.
 
 ### Querying the database
 Given the following data:
@@ -102,6 +101,15 @@ The list of column names can be accessed through
 result.series.head.columns
 ```
 
+Multiple queries can be sent to the server at the same time using the `multiQuery` method
+```scala
+database.multiQuery(List("SELECT * FROM cpu LIMIT 5", "SELECT * FROM cpu LIMIT 5 OFFSET 5"))
+```
+
+In this case, the result is a `Future[List[QueryResult]]`.
+
+Errors during queries return a `QueryException`.
+
 ### Managing users
 ```scala
 influxdb.createUser(username, password, isClusterAdmin)
@@ -122,7 +130,7 @@ database.dropRetentionPolicy(name)
 database.alterRetentionPolicy(name, duration, replication, default)
 ```
 
-*NOTE*: User and retention policy management primitives return an empty `QueryResult` or fail with a `QueryException` in case of an error.
+**NOTE**: User and retention policy management primitives return an empty `QueryResult` or fail with a `QueryException` in case of an error.
 
 ### Writing over UDP
 ```scala

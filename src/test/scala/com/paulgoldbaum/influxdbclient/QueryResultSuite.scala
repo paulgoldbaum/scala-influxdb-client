@@ -6,9 +6,9 @@ class QueryResultSuite extends CustomTestSuite {
 
   test("Construct result") {
     val data = """{"results":[{"series":[{"name":"databases","columns":["name"],"values":[["_internal"]],"tags":{"tag": "value"}}]}]}"""
-    val queryResponse = QueryResult.fromJson(data)
+    val queryResult = QueryResult.fromJson(data)
 
-    assert(queryResponse.series.length == 1)
+    assert(queryResult.series.length == 1)
   }
 
   test("Construct record") {
@@ -135,5 +135,13 @@ class QueryResultSuite extends CustomTestSuite {
     val data = """{"results":[{}]}"""
     val response = QueryResult.fromJson(data)
     assert(response.series.isEmpty)
+  }
+
+  test("Multiple results are parsed correctly") {
+    val data = """{"results":[{"series":[{"name":"databases","columns":["name"],"values":[["_internal"]],"tags":{"tag": "value"}}]},{"series":[{"name":"databases_2","columns":["name"],"values":[["_internal"]],"tags":{"tag": "value"}}]}]}"""
+    val queryResults = QueryResult.fromJsonMulti(data)
+    assert(queryResults.length == 2)
+    assert(queryResults(0).series.head.name == "databases")
+    assert(queryResults(1).series.head.name == "databases_2")
   }
 }

@@ -21,14 +21,21 @@ class Series protected[influxdbclient]
   def points(column: Int) = records.map(_(column))
 }
 
+protected[influxdbclient]
 object QueryResult {
 
-  protected[influxdbclient]
   def fromJson(data: String): QueryResult = {
-    val root = data.parseJson.asInstanceOf[JsObject]
-    val resultsArray = root.fields("results").asInstanceOf[JsArray]
+    val resultsArray = parseJson(data)
     val resultObject = resultsArray.elements.head.asInstanceOf[JsObject]
+    makeSingleResult(resultObject)
+  }
 
+  def fromJsonMulti(data: String): List[QueryResult] = {
+    val resultsArray = parseJson(data)
+    resultsArray.elements.map(result => makeSingleResult(result.asInstanceOf[JsObject])).toList
+  }
+
+  private def makeSingleResult(resultObject: JsObject): QueryResult = {
     val fields = resultObject.fields
     if (fields.contains("error")) {
       throw new ErrorResponseException(fields("error").toString())
@@ -43,7 +50,11 @@ object QueryResult {
     new QueryResult(series)
   }
 
-  protected[influxdbclient]
+  private def parseJson(data: String): JsArray = {
+    val root = data.parseJson.asInstanceOf[JsObject]
+    root.fields("results").asInstanceOf[JsArray]
+  }
+
   def constructSeries(value: JsValue): Series = {
     val fields = value.asInstanceOf[JsObject].fields
     val seriesName = if (fields.contains("name"))
@@ -74,7 +85,6 @@ object QueryResult {
     new Series(seriesName, columns, records, tags)
   }
 
-  protected[influxdbclient]
   def constructRecord(namesIndex: Map[String, Int], value: JsValue): Record = {
     val valueArray = value.asInstanceOf[JsArray]
     val values = valueArray.elements.map {
@@ -88,7 +98,6 @@ object QueryResult {
     new Record(namesIndex, values)
   }
 
-  protected[influxdbclient]
   def constructTagSet(tagsIndex: Map[String, Int], value: JsValue): TagSet = {
     val values = value.asJsObject.fields.map {
       case (key: String, JsNumber(num)) => num

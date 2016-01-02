@@ -33,9 +33,16 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
     query("SHOW DATABASES")
       .map(response => response.series.head.points("name").asInstanceOf[List[String]])
 
-  def query(query: String, precision: Precision = null) =
-    httpClient.get("/query", buildQueryParameters(query, precision))
+  def query(query: String, precision: Precision = null): Future[QueryResult] =
+    executeQuery(query, precision)
       .map(response => QueryResult.fromJson(response.content))
+
+  def multiQuery(query: Seq[String], precision: Precision = null): Future[List[QueryResult]] =
+    executeQuery(query.mkString(";"), precision)
+      .map(response => QueryResult.fromJsonMulti(response.content))
+
+  private def executeQuery(query: String, precision: Precision = null) =
+    httpClient.get("/query", buildQueryParameters(query, precision))
       .recover { case error: HttpException => throw new QueryException("Error during query", error)}
 
   def ping() =

@@ -62,4 +62,12 @@ class InfluxDBSuite extends CustomTestSuite {
       case e: QueryException => // expected
     }
   }
+
+  test("Multiple queries can be executed at the same time") {
+    val queries = List("select * from subscriber limit 5", "select * from \"write\" limit 5")
+    val results = await(influxdb.selectDatabase("_internal").multiQuery(queries))
+    assert(results.length == 2)
+    assert(results(0).series.head.name == "subscriber")
+    assert(results(1).series.head.name == "write")
+  }
 }
