@@ -10,8 +10,8 @@ after_success:
   - codecov
 
 before_install:
-  - wget https://s3.amazonaws.com/influxdb/influxdb_0.9.5_amd64.deb
-  - sudo dpkg -i influxdb_0.9.5_amd64.deb
+  - wget -O influxdb.deb https://s3.amazonaws.com/influxdb/influxdb_0.9.6.1_amd64.deb
+  - sudo dpkg -i influxdb.deb
   - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
   - sudo service influxdb start
   - sleep 5; /usr/bin/influx --execute "CREATE USER influx_user WITH PASSWORD 'influx_password' WITH ALL PRIVILEGES"
