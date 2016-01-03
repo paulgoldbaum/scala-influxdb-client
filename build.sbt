@@ -15,7 +15,6 @@ libraryDependencies += "io.netty" % "netty" % "3.10.4.Final"
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
-libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
 
 import ReleaseTransformations._
 
