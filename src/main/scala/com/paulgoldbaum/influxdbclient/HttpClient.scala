@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
+import com.ning.http.client.{Response, AsyncCompletionHandler, Param, AsyncHttpClient}
 import com.ning.http.client.Realm.{AuthScheme, RealmBuilder}
-import com.ning.http.client._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.collection.JavaConverters._
 
@@ -15,6 +15,7 @@ protected class HttpClient(val host: String,
 
   implicit private val ec = ExecutionContext.global
   private val authenticationRealm = makeAuthenticationRealm()
+  private var connectionClosed = false
 
   private val client: AsyncHttpClient = if (clientConfig == null)
     new AsyncHttpClient()
@@ -24,14 +25,11 @@ protected class HttpClient(val host: String,
   private val protocol = if (https) "https" else "http"
 
   def get(url: String, params: Map[String, String] = Map()): Future[HttpResponse] = {
-
     val requestBuilder = client.prepareGet("%s://%s:%d%s".format(protocol, host, port, url))
       .setRealm(authenticationRealm)
     requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
-    val resultPromise = Promise[HttpResponse]()
-    requestBuilder.execute(new ResponseHandler(resultPromise))
-    resultPromise.future
+    makeRequest(requestBuilder)
   }
 
   def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] = {
@@ -40,10 +38,27 @@ protected class HttpClient(val host: String,
       .setBody(content)
     requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
+    makeRequest(requestBuilder)
+  }
+
+  private def makeRequest(requestBuilder: AsyncHttpClient#BoundRequestBuilder): Future[HttpResponse] = {
     val resultPromise = Promise[HttpResponse]()
+    if (isClosed)
+      return resultPromise.failure(new HttpException("Connection is already closed")).future
+
     requestBuilder.execute(new ResponseHandler(resultPromise))
     resultPromise.future
   }
+
+  def close() = {
+    if (isClosed)
+      throw new HttpException("Connection is already closed")
+
+    client.close()
+    connectionClosed = true
+  }
+
+  def isClosed = connectionClosed
 
   private def makeAuthenticationRealm() = username match {
     case null => null

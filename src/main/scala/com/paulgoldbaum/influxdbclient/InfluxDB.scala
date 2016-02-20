@@ -13,8 +13,8 @@ object InfluxDB {
               https: Boolean = false,
               httpConfig: HttpConfig = null): InfluxDB =
   {
-     val httpClient = new HttpClient(host, port, https, username, password, httpConfig)
-     new InfluxDB(httpClient)
+    val httpClient = new HttpClient(host, port, https, username, password, httpConfig)
+    new InfluxDB(httpClient)
   }
 
   def udpConnect(host: String, port: Int) = {
@@ -49,6 +49,9 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
     httpClient.get("/ping")
       .map(response => new QueryResult())
       .recover { case error: HttpException => throw new PingException("Error during ping", error)}
+
+  def close() =
+    httpClient.close()
 
   protected def buildQueryParameters(query: String, precision: Precision) = {
     val params = Map("q" -> query)

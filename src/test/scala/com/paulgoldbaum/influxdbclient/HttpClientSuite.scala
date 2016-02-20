@@ -131,4 +131,26 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
       case e: HttpException =>
     }
   }
+
+  test("Closing a connection more than once throws an exception") {
+    val client = new HttpClient(host, port)
+    client.close()
+    try {
+      client.close()
+      fail("Did not throw exception")
+    } catch {
+      case e: HttpException =>
+    }
+  }
+
+  test("Using a closed connection to send a query returns an exception") {
+    val client = new HttpClient(host, port)
+    client.close()
+    try {
+      await(client.get("/query"))
+      fail("Did not throw exception")
+    } catch {
+      case e: HttpException =>
+    }
+  }
 }

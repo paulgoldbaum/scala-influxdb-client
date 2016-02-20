@@ -70,4 +70,12 @@ class InfluxDBSuite extends CustomTestSuite {
     assert(results(0).series.head.name == "subscriber")
     assert(results(1).series.head.name == "write")
   }
+
+  test("Connections can be closed") {
+    val influxdb = InfluxDB.connect()
+    influxdb.close()
+    val httpClient = influxdb.getHttpClient
+
+    assert(httpClient.isClosed)
+  }
 }
