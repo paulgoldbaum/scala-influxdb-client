@@ -50,6 +50,7 @@ class QueryResultSuite extends CustomTestSuite {
     assert(record("column1") == "value1")
     assert(record("column2") == 2)
     assert(record("column3") == true)
+    assert(record.allValues.length == 3)
   }
 
   test("Construct series without a name") {
@@ -91,7 +92,7 @@ class QueryResultSuite extends CustomTestSuite {
     }
   }
 
-  test("Value series can be accessed by name and position") {
+  test("Value series can be accessed by name, position and as a list") {
     val data = JsonParser("""{"name":"n","columns":["column1", "column2"],"values":[[1, 2],[2, 3],[3, 4],[4, 5]]}""")
     val series = QueryResult.constructSeries(data)
 
@@ -99,6 +100,7 @@ class QueryResultSuite extends CustomTestSuite {
     assert(series.points(0) == List(1, 2, 3, 4))
     assert(series.points("column2") == List(2, 3, 4, 5))
     assert(series.points(1) == List(2, 3, 4, 5))
+    assert(series.allValues == List(List(1, 2), List(2, 3), List(3, 4), List(4, 5)))
   }
 
   test("Tags can be accessed by name and position") {
