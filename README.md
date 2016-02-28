@@ -89,7 +89,7 @@ which we can iterate to access the different fields
 ```scala
 result.series.head.records.foreach(record => record("host"))
 ```
-For each record, we can access al it's values at once using the allValues property
+For each record, we can access all it's values at once using the allValues property
 ```scala
 result.series.head.records(0).allValues
 ```
