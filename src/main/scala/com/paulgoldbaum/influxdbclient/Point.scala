@@ -10,7 +10,7 @@ case class Point(key: String, timestamp: Long = -1, tags: List[Tag] = List(), fi
 
   def serialize() = {
     val sb = new StringBuilder
-    sb.append(key)
+    sb.append(escapeKey(key))
     if (tags.nonEmpty) {
       sb.append(",")
       sb.append(tags.map(_.serialize).mkString(","))
@@ -28,4 +28,6 @@ case class Point(key: String, timestamp: Long = -1, tags: List[Tag] = List(), fi
 
     sb.toString()
   }
+
+  private def escapeKey(key: String) = key.replaceAll("([ ,])", "\\\\$1")
 }
