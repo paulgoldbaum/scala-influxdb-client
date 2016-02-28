@@ -9,7 +9,7 @@ Asynchronous library for accessing InfluxDB from Scala.
 ## Installation
 Add the following to your `build.sbt`
 ```scala
-libraryDependencies += "com.paulgoldbaum" %% "scala-influxdb-client" % "0.4.2"
+libraryDependencies += "com.paulgoldbaum" %% "scala-influxdb-client" % "0.4.3"
 ```
 
 ## Connecting
@@ -88,6 +88,10 @@ result.series.head.records
 which we can iterate to access the different fields
 ```scala
 result.series.head.records.foreach(record => record("host"))
+```
+For each record, we can access al it's values at once using the allValues property
+```scala
+result.series.head.records(0).allValues
 ```
 
 If we are only interested in the "value" field of each record
