@@ -56,7 +56,7 @@ class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object 
   protected def buildQueryParameters(query: String, precision: Precision) = {
     val params = Map("q" -> query)
     if (precision != null)
-      params + ("precision" -> precision.toString)
+      params + ("epoch" -> precision.toString)
     else
       params
   }

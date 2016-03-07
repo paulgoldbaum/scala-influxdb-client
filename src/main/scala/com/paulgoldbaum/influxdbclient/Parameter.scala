@@ -7,7 +7,7 @@ object Parameter {
       override def toString = str
     }
 
-    case object NANOSECONDS extends Precision("n")
+    case object NANOSECONDS extends Precision("ns")
     case object MICROSECONDS extends Precision("u")
     case object MILLISECONDS extends Precision("ms")
     case object SECONDS extends Precision("s")

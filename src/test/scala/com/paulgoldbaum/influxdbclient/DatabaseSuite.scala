@@ -64,7 +64,7 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAf
                      precision = Precision.MILLISECONDS))
     val result = await(database.query("SELECT * FROM test_measurement", Precision.MILLISECONDS))
 
-    assert(result.series.length == 1)
+    assert(result.series.head.records.head("time") == time)
   }
 
   test("A point can be written with a consistency parameter") {
