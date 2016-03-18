@@ -19,7 +19,7 @@ class Database protected[influxdbclient]
     executeWrite(point.serialize(), precision, consistency, retentionPolicy)
   }
 
-  def bulkWrite(points: List[Point],
+  def bulkWrite(points: Seq[Point],
             precision: Precision = null,
             consistency: Consistency = null,
             retentionPolicy: String = null): Future[Boolean] =
