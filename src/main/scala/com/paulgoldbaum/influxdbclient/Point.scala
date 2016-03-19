@@ -1,12 +1,12 @@
 package com.paulgoldbaum.influxdbclient
 
-case class Point(key: String, timestamp: Long = -1, tags: List[Tag] = List(), fields: List[Field] = List()) {
-  def addTag(key: String, value: String) = copy(tags = Tag(key, value) :: tags)
+case class Point(key: String, timestamp: Long = -1, tags: Seq[Tag] = Nil, fields: Seq[Field] = Nil) {
+  def addTag(key: String, value: String) = copy(tags = Tag(key, value) +: tags)
 
-  def addField(key: String, value: String) = copy(fields = StringField(key, value) :: fields)
-  def addField(key: String, value: Double) = copy(fields = DoubleField(key, value) :: fields)
-  def addField(key: String, value: Long) = copy(fields = LongField(key, value) :: fields)
-  def addField(key: String, value: Boolean) = copy(fields = BooleanField(key, value) :: fields)
+  def addField(key: String, value: String) = copy(fields = StringField(key, value) +: fields)
+  def addField(key: String, value: Double) = copy(fields = DoubleField(key, value) +: fields)
+  def addField(key: String, value: Long) = copy(fields = LongField(key, value) +: fields)
+  def addField(key: String, value: Boolean) = copy(fields = BooleanField(key, value) +: fields)
 
   def serialize() = {
     val sb = new StringBuilder
