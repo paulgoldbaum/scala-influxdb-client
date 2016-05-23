@@ -13,7 +13,7 @@ after_success:
   - codecov
 
 before_install:
-  - wget -O influxdb.deb https://s3.amazonaws.com/influxdb/influxdb_0.9.6.1_amd64.deb
+  - wget --secure-protocol=TLSv1 -O influxdb.deb http://dl.influxdata.com/influxdb/releases/influxdb_0.13.0_amd64.deb
   - sudo dpkg -i influxdb.deb
   - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
   - sudo service influxdb start
