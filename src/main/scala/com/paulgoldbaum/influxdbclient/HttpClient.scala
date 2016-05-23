@@ -1,7 +1,7 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.ning.http.client.{Response, AsyncCompletionHandler, Param, AsyncHttpClient}
-import com.ning.http.client.Realm.{AuthScheme, RealmBuilder}
+import org.asynchttpclient._
+import org.asynchttpclient.Realm.{AuthScheme, Builder}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.collection.JavaConverters._
 
@@ -18,9 +18,9 @@ protected class HttpClient(val host: String,
   private var connectionClosed = false
 
   private val client: AsyncHttpClient = if (clientConfig == null)
-    new AsyncHttpClient()
+    new DefaultAsyncHttpClient()
   else
-    new AsyncHttpClient(clientConfig.build())
+    new DefaultAsyncHttpClient(clientConfig.build())
 
   private val protocol = if (https) "https" else "http"
 
@@ -41,7 +41,7 @@ protected class HttpClient(val host: String,
     makeRequest(requestBuilder)
   }
 
-  private def makeRequest(requestBuilder: AsyncHttpClient#BoundRequestBuilder): Future[HttpResponse] = {
+  private def makeRequest(requestBuilder: BoundRequestBuilder): Future[HttpResponse] = {
     val resultPromise = Promise[HttpResponse]()
     if (isClosed)
       return resultPromise.failure(new HttpException("Connection is already closed")).future
@@ -60,11 +60,9 @@ protected class HttpClient(val host: String,
 
   def isClosed = connectionClosed
 
-  private def makeAuthenticationRealm() = username match {
+  private def makeAuthenticationRealm(): Realm = username match {
     case null => null
-    case _ => new RealmBuilder()
-      .setPrincipal(username)
-      .setPassword(password)
+    case _ => new Builder(username, password)
       .setUsePreemptiveAuth(true)
       .setScheme(AuthScheme.BASIC)
       .build()

@@ -1,9 +1,9 @@
 package com.paulgoldbaum.influxdbclient
 
-import com.ning.http.client.AsyncHttpClientConfig
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
 
 class HttpConfig {
-  private var builder = new AsyncHttpClientConfig.Builder
+  private var builder = new DefaultAsyncHttpClientConfig.Builder
 
   def setConnectTimeout(timeout: Int) = {
     builder = builder.setConnectTimeout(timeout)

@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
-class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {
+class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
 
   var host = "localhost"
   var port = 64011
@@ -25,8 +25,9 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
     mockServer.stop()
   }
 
-  override def afterAll() = {
+  override def afterAll = {
     mockServer.shutdown()
+    super.afterAll
   }
 
   test("Basic requests are received") {
@@ -36,6 +37,7 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
     val future = client.get(url)
     val result = await(future)
     assert(result.code == 200)
+    client.close()
   }
 
   test("Https requests are received") {
@@ -46,6 +48,7 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
     val future = client.get(url)
     val result = await(future)
     assert(result.code == 200)
+    client.close()
   }
 
   test("Error responses are handled correctly") {
@@ -63,6 +66,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
     } catch {
       case e: HttpException =>
         assert(e.code == 500)
+    } finally {
+      client.close()
     }
   }
 
@@ -75,6 +80,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
+    } finally {
+      client.close()
     }
   }
 
@@ -85,7 +92,7 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
         aResponse()
           .withFixedDelay(200)
           .withStatus(200)
-          .withBody("")))
+          .withBody("a")))
 
     val config = new HttpConfig().setRequestTimeout(50)
     val client = new HttpClient(host, port, false, null, null, config)
@@ -95,26 +102,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
-    }
-  }
-
-  test("Future fails if read takes too long") {
-    val url = "/query"
-    stubFor(get(urlEqualTo(url))
-      .willReturn(
-        aResponse()
-          .withFixedDelay(200)
-          .withStatus(200)
-          .withBody("")))
-
-    val config = new HttpConfig().setReadTimeout(50)
-    val client = new HttpClient(host, port, false, null, null, config)
-
-    try {
-      await(client.get(url))
-      fail("Did not throw exception")
-    } catch {
-      case e: HttpException =>
+    } finally {
+      client.close()
     }
   }
 
@@ -129,6 +118,8 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter with BeforeAnd
       fail("Did not throw exception")
     } catch {
       case e: HttpException =>
+    } finally {
+      client.close()
     }
   }
 
