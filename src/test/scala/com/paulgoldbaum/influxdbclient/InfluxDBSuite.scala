@@ -12,6 +12,7 @@ class InfluxDBSuite extends CustomTestSuite {
     assert(httpClient.port == 8086)
     assert(httpClient.username == null)
     assert(httpClient.password == null)
+    influxdb.close()
   }
 
   test("Overridden parameters are returned in client") {
@@ -27,6 +28,7 @@ class InfluxDBSuite extends CustomTestSuite {
     assert(httpClient.port == 1234)
     assert(httpClient.username == "user")
     assert(httpClient.password == "password")
+    influxdb.close()
   }
 
   test("Returns correct database") {
@@ -41,6 +43,7 @@ class InfluxDBSuite extends CustomTestSuite {
 
   test("Server can be pinged") {
     await(influxdb.ping())
+
   }
 
   test("If an error happens during a ping a PingException is thrown") {
@@ -50,6 +53,8 @@ class InfluxDBSuite extends CustomTestSuite {
       fail("Exception not thrown")
     } catch {
       case e: PingException => // expected
+    } finally {
+      client.close()
     }
   }
 
@@ -60,6 +65,8 @@ class InfluxDBSuite extends CustomTestSuite {
       fail("Exception not thrown")
     } catch {
       case e: QueryException => // expected
+    } finally {
+      client.close()
     }
   }
 

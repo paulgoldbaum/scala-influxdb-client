@@ -4,7 +4,7 @@ import com.paulgoldbaum.influxdbclient.Mocks.{ExceptionThrowingHttpClient, Error
 import com.paulgoldbaum.influxdbclient.Parameter.{Consistency, Precision}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter}
 
-class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAfterAll {
+class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
 
   val database = influxdb.selectDatabase("_test_database_db")
 
@@ -17,8 +17,10 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter with BeforeAndAf
     await(database.create())
   }
 
-  override def afterAll() =
+  override def afterAll = {
     await(database.drop())
+    super.afterAll
+  }
 
   test("Writing to a non-existent database throws a DatabaseNotFoundException") {
     val database = influxdb.selectDatabase("_test_database_db_2")
