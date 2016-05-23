@@ -11,6 +11,7 @@ Add the following to your `build.sbt`
 ```scala
 libraryDependencies += "com.paulgoldbaum" %% "scala-influxdb-client" % "0.4.5"
 ```
+**NOTE**: Starting with version 0.5.0 JDK 8 is required.
 
 ## Connecting
 ```scala
