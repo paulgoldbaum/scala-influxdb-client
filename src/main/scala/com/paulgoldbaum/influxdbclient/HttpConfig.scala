@@ -10,11 +10,6 @@ class HttpConfig {
     this
   }
 
-  def setReadTimeout(timeout: Int) = {
-    builder = builder.setReadTimeout(timeout)
-    this
-  }
-
   def setRequestTimeout(timeout: Int) = {
     builder = builder.setRequestTimeout(timeout)
     this
