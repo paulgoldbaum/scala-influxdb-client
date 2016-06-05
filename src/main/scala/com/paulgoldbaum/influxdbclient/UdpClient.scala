@@ -15,6 +15,8 @@ class UdpClient protected[influxdbclient](host: String, port: Int) {
     send(points.map(_.serialize()).mkString("\n").getBytes)
   }
 
+  def close() = socket.close()
+
   private def send(payload: Array[Byte]) = {
     val packet = new DatagramPacket(payload, payload.length, address)
     socket.send(packet)

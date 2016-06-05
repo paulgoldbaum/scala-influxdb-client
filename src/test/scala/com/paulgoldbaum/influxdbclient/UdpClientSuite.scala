@@ -8,10 +8,7 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
   val database = influxdb.selectDatabase(databaseName)
 
   before {
-    val exists = await(database.exists())
-    if (!exists) {
-      await(database.create())
-    }
+    await(database.create())
   }
 
   after {
@@ -21,7 +18,8 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
   test("Points can be written") {
     val udpClient = InfluxDB.udpConnect("localhost", 8086)
     udpClient.write(Point("test_measurement").addField("value", 123).addTag("tag_key", "tag_value"))
-    Thread.sleep(200) // to allow flushing to happen inside influx
+    udpClient.close()
+    Thread.sleep(1000) // to allow flushing to happen inside influx
 
     val database = influxdb.selectDatabase(databaseName)
     val result = await(database.query("SELECT * FROM test_measurement"))
@@ -37,7 +35,8 @@ class UdpClientSuite extends CustomTestSuite with BeforeAndAfter {
       Point("test_measurement", timestamp + 1).addField("value", 2).addTag("tag_key", "tag_value"),
       Point("test_measurement", timestamp + 2).addField("value", 3).addTag("tag_key", "tag_value")
     ))
-    Thread.sleep(200) // to allow flushing to happen inside influx
+    udpClient.close()
+    Thread.sleep(1000) // to allow flushing to happen inside influx
 
     val database = influxdb.selectDatabase(databaseName)
     val result = await(database.query("SELECT * FROM test_measurement"))
