@@ -10,10 +10,9 @@ protected class HttpClient(val host: String,
                           val https: Boolean = false,
                           val username: String = null,
                           val password: String = null,
-                          val clientConfig: HttpConfig = null)
+                          val clientConfig: HttpConfig = null)(implicit ec: ExecutionContext)
 {
 
-  implicit private val ec = ExecutionContext.global
   private val authenticationRealm = makeAuthenticationRealm()
   private var connectionClosed = false
 

@@ -16,6 +16,7 @@ libraryDependencies += "com.paulgoldbaum" %% "scala-influxdb-client" % "0.4.5"
 ## Connecting
 ```scala
 import com.paulgoldbaum.influxdbclient._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 val influxdb = InfluxDB.connect("localhost", 8086)
 ```

@@ -3,13 +3,14 @@ package com.paulgoldbaum.influxdbclient
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Awaitable}
+import scala.concurrent.{Await, Awaitable, ExecutionContext}
 
 class CustomTestSuite extends FunSuite with BeforeAndAfterAll {
 
   val waitDuration = 2.seconds
   val databaseUsername = "influx_user"
   val databasePassword = "influx_password"
+  implicit val ec = ExecutionContext.global
 
   val influxdb = InfluxDB.connect("localhost", 8086, databaseUsername, databasePassword, false)
 

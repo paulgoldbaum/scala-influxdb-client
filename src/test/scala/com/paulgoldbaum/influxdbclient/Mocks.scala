@@ -1,9 +1,10 @@
 package com.paulgoldbaum.influxdbclient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object Mocks {
-  class ExceptionThrowingHttpClient(host: String, port: Int) extends HttpClient(host, port) {
+  class ExceptionThrowingHttpClient(host: String, port: Int)(implicit ec: ExecutionContext)
+      extends HttpClient(host, port) {
     override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] =
       Future.failed(new HttpException(""))
 
@@ -11,7 +12,8 @@ object Mocks {
       Future.failed(new HttpException(""))
   }
 
-  class ErrorReturningHttpClient(host: String, port: Int, errorCode: Int) extends HttpClient(host, port) {
+  class ErrorReturningHttpClient(host: String, port: Int, errorCode: Int)(implicit ec: ExecutionContext)
+      extends HttpClient(host, port) {
     override def post(url: String, params: Map[String, String] = Map(), content: String): Future[HttpResponse] =
       Future.successful(new HttpResponse(errorCode, "Error message"))
 

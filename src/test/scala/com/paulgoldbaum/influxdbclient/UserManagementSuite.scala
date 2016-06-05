@@ -1,7 +1,5 @@
 package com.paulgoldbaum.influxdbclient
 
-import org.scalatest.BeforeAndAfterAll
-
 class UserManagementSuite extends CustomTestSuite {
 
   val username = "_test_username"

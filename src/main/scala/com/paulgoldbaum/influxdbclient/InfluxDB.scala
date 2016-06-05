@@ -11,7 +11,7 @@ object InfluxDB {
               username: String = null,
               password: String = null,
               https: Boolean = false,
-              httpConfig: HttpConfig = null): InfluxDB =
+              httpConfig: HttpConfig = null)(implicit ec: ExecutionContext): InfluxDB =
   {
     val httpClient = new HttpClient(host, port, https, username, password, httpConfig)
     new InfluxDB(httpClient)
@@ -22,9 +22,10 @@ object InfluxDB {
   }
 }
 
-class InfluxDB protected[influxdbclient](httpClient: HttpClient) extends Object with UserManagement {
-
-  implicit val ec = ExecutionContext.global
+class InfluxDB protected[influxdbclient]
+(httpClient: HttpClient)
+(implicit protected val ec: ExecutionContext)
+  extends Object with UserManagement {
 
   def selectDatabase(databaseName: String) =
     new Database(databaseName, httpClient)
