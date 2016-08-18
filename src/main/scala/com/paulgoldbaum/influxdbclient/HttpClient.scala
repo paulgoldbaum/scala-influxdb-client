@@ -1,5 +1,6 @@
 package com.paulgoldbaum.influxdbclient
 
+import java.nio.charset.Charset
 import org.asynchttpclient._
 import org.asynchttpclient.Realm.{AuthScheme, Builder}
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -35,6 +36,7 @@ protected class HttpClient(val host: String,
     val requestBuilder = client.preparePost("%s://%s:%d%s".format(protocol, host, port, url))
       .setRealm(authenticationRealm)
       .setBody(content)
+      .setCharset(Charset.forName("UTF-8"))
     requestBuilder.setQueryParams(params.map(p => new Param(p._1, p._2)).toList.asJava)
 
     makeRequest(requestBuilder)
