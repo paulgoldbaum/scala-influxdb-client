@@ -21,6 +21,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 val influxdb = InfluxDB.connect("localhost", 8086)
 ```
 
+And when all done close the client:
+ 
+```scala
+influxdb.close()
+```
+
 ## Usage
 All methods are non-blocking and return a `Future`; in most cases a `Future[QueryResponse]` which might be empty if
 the action does not return a result. Failing `Futures` carry a subclass of `InfluxDBException`
