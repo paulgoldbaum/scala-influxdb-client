@@ -11,7 +11,7 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis.jvmopts clean coverage test coverageReport
 
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 
 before_install:
   - curl -o influxdb.deb https://dl.influxdata.com/influxdb/releases/influxdb_0.13.0_amd64.deb
@@ -19,4 +19,3 @@ before_install:
   - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
   - sudo service influxdb start
   - sleep 5; /usr/bin/influx --execute "CREATE USER influx_user WITH PASSWORD 'influx_password' WITH ALL PRIVILEGES"
-  - pip install --user codecov
