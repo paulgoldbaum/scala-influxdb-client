@@ -10,9 +10,9 @@ testOptions in Test += Tests.Argument("-oDF")
 useGpg := true
 releaseCrossBuild := true
 
-libraryDependencies += "org.asynchttpclient" % "async-http-client" % "2.0.3"
+libraryDependencies += "org.asynchttpclient" % "async-http-client" % "2.0.24"
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
-libraryDependencies += "com.github.tomakehurst" % "wiremock" % "1.57" % "test"
+libraryDependencies += "com.github.tomakehurst" % "wiremock" % "2.3.1" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 import ReleaseTransformations._
