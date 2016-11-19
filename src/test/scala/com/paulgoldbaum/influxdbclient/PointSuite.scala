@@ -20,6 +20,24 @@ class PointSuite extends CustomTestSuite {
       "measurement,tag_key1=tag_value1,tag_key2=tag_value2 field_key1=\"field_value1\",field_key2=2i,field_key3=true,field_key4=12.34 1234567890")
   }
 
+  test("Tags cannot contain null values") {
+    try {
+      Tag("key", null)
+      fail("Exception was not thrown")
+    } catch {
+      case e: IllegalArgumentException => // expected
+    }
+  }
+
+  test("Tags cannot contain empty values") {
+    try {
+      Tag("key", "")
+      fail("Exception was not thrown")
+    } catch {
+      case e: IllegalArgumentException => // expected
+    }
+  }
+
   test("Tags are serialized correctly") {
     assert(Tag("key", "value").serialize == "key=value")
   }
