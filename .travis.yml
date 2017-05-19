@@ -14,7 +14,7 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 before_install:
-  - curl -o influxdb.deb https://dl.influxdata.com/influxdb/releases/influxdb_0.13.0_amd64.deb
+  - curl -o influxdb.deb https://dl.influxdata.com/influxdb/releases/influxdb_1.2.4_amd64.deb
   - sudo dpkg -i influxdb.deb
   - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
   - sudo service influxdb start
