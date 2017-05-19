@@ -3,7 +3,7 @@ package com.paulgoldbaum.influxdbclient
 object Parameter {
 
   object Precision {
-    sealed abstract class Precision(str: String) {
+    sealed abstract class Precision(str: String) extends Serializable {
       override def toString = str
     }
 
@@ -16,7 +16,7 @@ object Parameter {
   }
 
   object Consistency {
-    sealed abstract class Consistency(str: String) {
+    sealed abstract class Consistency(str: String) extends Serializable {
       override def toString = str
     }
 
