@@ -19,3 +19,7 @@ case class LongField(key: String, value: Long) extends Field {
 case class BooleanField(key: String, value: Boolean) extends Field {
   def serialize = Util.escapeString(key) + "=" + value
 }
+
+case class BigDecimalField(key: String, value: BigDecimal) extends Field {
+  def serialize = Util.escapeString(key) + "=" + value
+}

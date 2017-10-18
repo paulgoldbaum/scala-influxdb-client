@@ -11,13 +11,14 @@ class PointSuite extends CustomTestSuite {
     val point = Point("measurement", 1234567890l)
       .addTag("tag_key2", "tag_value2")
       .addTag("tag_key1", "tag_value1")
+      .addField("field_key5", BigDecimal("51.98890310"))
       .addField("field_key4", 12.34)
       .addField("field_key3", true)
       .addField("field_key2", 2)
       .addField("field_key1", "field_value1")
 
     assert(point.serialize ==
-      "measurement,tag_key1=tag_value1,tag_key2=tag_value2 field_key1=\"field_value1\",field_key2=2i,field_key3=true,field_key4=12.34 1234567890")
+      "measurement,tag_key1=tag_value1,tag_key2=tag_value2 field_key1=\"field_value1\",field_key2=2i,field_key3=true,field_key4=12.34,field_key5=51.98890310 1234567890")
   }
 
   test("Tags cannot contain null values") {
@@ -62,6 +63,10 @@ class PointSuite extends CustomTestSuite {
 
   test("Boolean fields are serialized correctly") {
     assert(BooleanField("key", value = true).serialize == "key=true")
+  }
+
+  test("BigDecimal fields are serialized correctly") {
+    assert(BigDecimalField("key", BigDecimal("51.98890310")).serialize == "key=51.98890310")
   }
 
   test("Fields are escaped correctly") {
