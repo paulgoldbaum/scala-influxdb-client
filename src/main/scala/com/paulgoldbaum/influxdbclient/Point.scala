@@ -7,6 +7,7 @@ case class Point(key: String, timestamp: Long = -1, tags: Seq[Tag] = Nil, fields
   def addField(key: String, value: Double) = copy(fields = DoubleField(key, value) +: fields)
   def addField(key: String, value: Long) = copy(fields = LongField(key, value) +: fields)
   def addField(key: String, value: Boolean) = copy(fields = BooleanField(key, value) +: fields)
+  def addField(key: String, value: BigDecimal) = copy(fields = BigDecimalField(key, value) +: fields)
 
   def serialize() = {
     val sb = new StringBuilder
