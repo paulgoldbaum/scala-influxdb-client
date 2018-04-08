@@ -7,15 +7,15 @@ scala:
 jdk:
   - oraclejdk8
 
+sudo: required
+
+services:
+  - docker
+
 script:
+  - docker-compose up --build -d
+  - sleep 30
   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis.jvmopts clean coverage test coverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
-before_install:
-  - curl -o influxdb.deb https://dl.influxdata.com/influxdb/releases/influxdb_1.2.4_amd64.deb
-  - sudo dpkg -i influxdb.deb
-  - sudo cp src/test/resources/influxdb.conf /etc/influxdb/influxdb.conf
-  - sudo service influxdb start
-  - sleep 5; /usr/bin/influx --execute "CREATE USER influx_user WITH PASSWORD 'influx_password' WITH ALL PRIVILEGES"
