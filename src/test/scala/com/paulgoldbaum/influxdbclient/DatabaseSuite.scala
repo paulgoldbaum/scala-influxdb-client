@@ -71,7 +71,7 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
 
   test("A point can be written with a consistency parameter") {
     await(
-      database.write(Point("test_measurement", 11111111).addField("value", 123),
+      database.write(Point("test_measurement").addField("value", 123),
         consistency = Consistency.ALL))
     val result = await(database.query("SELECT * FROM test_measurement"))
     assert(result.series.length == 1)
@@ -82,7 +82,7 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
     val measurementName = "test_measurement"
     await(database.createRetentionPolicy(retentionPolicyName, "1w", 1, default = false))
     await(
-      database.write(Point(measurementName, 11111111).addField("value", 123),
+      database.write(Point(measurementName).addField("value", 123),
         retentionPolicy = retentionPolicyName))
     val result = await(database.query("SELECT * FROM %s.%s".format(retentionPolicyName, measurementName)))
     assert(result.series.length == 1)
@@ -91,7 +91,7 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
   test("Writing to a non-existent retention policy throws an error") {
     try {
       await(
-        database.write(Point("test_measurement", 11111111).addField("value", 123),
+        database.write(Point("test_measurement").addField("value", 123),
           retentionPolicy = "fake_retention_policy"))
       fail("Write using non-existent retention policy did not fail")
     } catch {

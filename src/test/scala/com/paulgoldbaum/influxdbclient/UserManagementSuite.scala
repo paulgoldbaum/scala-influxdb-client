@@ -25,29 +25,44 @@ class UserManagementSuite extends CustomTestSuite {
 
   test("A user's password can be changed") {
     await(influxdb.createUser(username, password))
-    await(influxdb.setUserPassword(username, "new_password"))
-    await(influxdb.dropUser(username))
+    try {
+      await(influxdb.setUserPassword(username, "new_password"))
+    } finally {
+      await(influxdb.dropUser(username))
+    }
   }
 
   test("Privileges can be granted to and revoked from a user") {
     await(influxdb.createUser(username, password))
-    await(influxdb.grantPrivileges(username, "_test_database", ALL))
-    await(influxdb.revokePrivileges(username, "_test_database", WRITE))
-    await(influxdb.dropUser(username))
+    val database = influxdb.selectDatabase("_test_database")
+    await(database.create())
+    try {
+      await(influxdb.grantPrivileges(username, "_test_database", ALL))
+      await(influxdb.revokePrivileges(username, "_test_database", WRITE))
+    } finally {
+      await(influxdb.dropUser(username))
+      database.drop()
+    }
   }
 
   test("A user can be created as cluster admin") {
     await(influxdb.createUser(username, password, true))
-    await(influxdb.showUsers())
-    testIsClusterAdmin()
-    await(influxdb.dropUser(username))
+    try {
+      await(influxdb.showUsers())
+      testIsClusterAdmin()
+    } finally {
+      await(influxdb.dropUser(username))
+    }
   }
 
   test("A user can be made cluster admin") {
     await(influxdb.createUser(username, password))
-    await(influxdb.makeClusterAdmin(username))
-    testIsClusterAdmin()
-    await(influxdb.dropUser(username))
+    try {
+      await(influxdb.makeClusterAdmin(username))
+      testIsClusterAdmin()
+    } finally {
+      await(influxdb.dropUser(username))
+    }
   }
 
   def testIsClusterAdmin() = {

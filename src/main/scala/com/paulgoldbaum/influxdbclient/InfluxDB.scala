@@ -38,6 +38,11 @@ class InfluxDB protected[influxdbclient]
     executeQuery(query, precision)
       .map(response => QueryResult.fromJson(response.content))
 
+  def post(query: String): Future[QueryResult] =
+    httpClient.post("/query", buildQueryParameters(query, null), "")
+      .map(response => QueryResult.fromJson(response.content))
+      .recover { case error: HttpException => throw new QueryException("Error during query", error)}
+
   def multiQuery(query: Seq[String], precision: Precision = null): Future[List[QueryResult]] =
     executeQuery(query.mkString(";"), precision)
       .map(response => QueryResult.fromJsonMulti(response.content))
