@@ -14,8 +14,10 @@ services:
 
 script:
   - docker-compose up --build -d
-  - sleep 30
   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis.jvmopts clean coverage test coverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+after_script:
+  - docker-compose down
