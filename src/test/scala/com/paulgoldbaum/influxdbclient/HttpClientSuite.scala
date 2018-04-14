@@ -43,7 +43,7 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
   test("Https requests are received") {
     val url = "/query"
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(200).withBody("")))
-    val config = new HttpConfig().setAcceptAnyCertificate(true)
+    val config = new HttpConfig().setUseInsecureTrustManager(true)
     val client = new HttpClient(host, httpsPort, true, null, null, config)
     val future = client.get(url)
     val result = await(future)
