@@ -2,7 +2,7 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Parameter.Precision.Precision
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 object InfluxDB {
 
@@ -25,7 +25,7 @@ object InfluxDB {
 class InfluxDB protected[influxdbclient]
 (httpClient: HttpClient)
 (implicit protected val ec: ExecutionContext)
-  extends Object with UserManagement {
+  extends Object with UserManagement with AutoCloseable {
 
   def selectDatabase(databaseName: String) =
     new Database(databaseName, httpClient)
@@ -37,6 +37,11 @@ class InfluxDB protected[influxdbclient]
   def query(query: String, precision: Precision = null): Future[QueryResult] =
     executeQuery(query, precision)
       .map(response => QueryResult.fromJson(response.content))
+
+  def exec(query: String): Future[QueryResult] =
+    httpClient.post("/query", buildQueryParameters(query, null), "")
+      .map(response => QueryResult.fromJson(response.content))
+      .recover { case error: HttpException => throw new QueryException("Error during query", error)}
 
   def multiQuery(query: Seq[String], precision: Precision = null): Future[List[QueryResult]] =
     executeQuery(query.mkString(";"), precision)

@@ -122,6 +122,12 @@ In this case, the result is a `Future[List[QueryResult]]`.
 
 Errors during queries return a `QueryException`.
 
+### Executing actions
+To execute any action that is not covered by the API you can use the `exec` method
+```scala
+influxdb.exec("CREATE CONTINUOUS QUERY ...")
+```
+
 ### Managing users
 ```scala
 influxdb.createUser(username, password, isClusterAdmin)

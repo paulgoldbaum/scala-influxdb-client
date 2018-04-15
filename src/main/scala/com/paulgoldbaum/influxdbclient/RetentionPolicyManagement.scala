@@ -18,7 +18,7 @@ protected[influxdbclient] trait RetentionPolicyManagement { self: Database =>
     query("SHOW RETENTION POLICIES ON \"%s\"".format(databaseName))
 
   def dropRetentionPolicy(name: String) =
-    query("DROP RETENTION POLICY \"%s\" ON \"%s\"".format(name, databaseName))
+    exec("DROP RETENTION POLICY \"%s\" ON \"%s\"".format(name, databaseName))
 
   def alterRetentionPolicy(name: String, duration: String = null, replication: Int = -1, default: Boolean = false) = {
     if (duration == null && replication == -1 && !default)
