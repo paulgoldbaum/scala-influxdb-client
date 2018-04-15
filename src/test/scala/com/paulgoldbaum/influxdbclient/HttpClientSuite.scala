@@ -15,14 +15,11 @@ class HttpClientSuite extends CustomTestSuite with BeforeAndAfter {
   var mockServer: WireMockServer = new WireMockServer(
     wireMockConfig().port(port).containerThreads(10).jettyAcceptors(1).httpsPort(httpsPort)
   )
+  mockServer.start()
+  WireMock.configureFor(host, port)
 
   before {
-    mockServer.start()
-    WireMock.configureFor(host, port)
-  }
-
-  after {
-    mockServer.stop()
+    WireMock.reset()
   }
 
   override def afterAll = {
