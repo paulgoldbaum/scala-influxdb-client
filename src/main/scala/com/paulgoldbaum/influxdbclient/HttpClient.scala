@@ -73,9 +73,7 @@ protected class HttpClient(val host: String,
 
     override def onCompleted(response: Response): Response = {
       if (response.getStatusCode >= 400)
-        promise.failure(new HttpException(
-          "Server answered with error code " + response.getStatusCode + ". Details: " + response.getResponseBody,
-          response.getStatusCode))
+        promise.failure(new HttpException(s"Server answered with error code ${response.getStatusCode}. Message: ${response.getResponseBody}", response.getStatusCode))
       else
         promise.success(new HttpResponse(response.getStatusCode, response.getResponseBody))
       response

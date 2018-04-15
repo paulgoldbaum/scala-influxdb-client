@@ -33,7 +33,7 @@ class Database protected[influxdbclient]
     val params = buildWriteParameters(databaseName, precision, consistency, retentionPolicy)
 
     httpClient.post("/write", params, payload)
-      .recover { case error: HttpException => throw exceptionFromStatusCode(error.code, "Error during write", error)}
+      .recover { case error: HttpException => throw exceptionFromStatusCode(error.code, "Error during write: " + error.getMessage, error)}
       .map { result =>
         if (result.code != 204)
           throw exceptionFromStatusCode(result.code, "Error during write: " + result.content)
@@ -63,7 +63,8 @@ class Database protected[influxdbclient]
       case e if 400 <= e && e <= 499 => new MalformedRequestException(str, throwable)
       case e if 500 <= e && e <= 599 => new ServerUnavailableException(str, throwable)
       case _ => new UnknownErrorException(str, throwable)
-  }
+    }
+
 }
 
 
