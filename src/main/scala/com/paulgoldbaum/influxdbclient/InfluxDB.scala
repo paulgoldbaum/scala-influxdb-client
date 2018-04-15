@@ -38,7 +38,7 @@ class InfluxDB protected[influxdbclient]
     executeQuery(query, precision)
       .map(response => QueryResult.fromJson(response.content))
 
-  def post(query: String): Future[QueryResult] =
+  def exec(query: String): Future[QueryResult] =
     httpClient.post("/query", buildQueryParameters(query, null), "")
       .map(response => QueryResult.fromJson(response.content))
       .recover { case error: HttpException => throw new QueryException("Error during query", error)}
