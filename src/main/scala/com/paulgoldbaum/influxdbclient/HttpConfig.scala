@@ -16,7 +16,7 @@ class HttpConfig {
   }
 
   def setAcceptAnyCertificate(acceptAnyCertificate: Boolean) = {
-    builder = builder.setAcceptAnyCertificate(acceptAnyCertificate)
+    builder = builder.setUseInsecureTrustManager(acceptAnyCertificate)
     this
   }
 
