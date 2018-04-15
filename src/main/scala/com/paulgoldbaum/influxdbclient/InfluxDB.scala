@@ -2,7 +2,7 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Parameter.Precision.Precision
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 object InfluxDB {
 
@@ -25,7 +25,7 @@ object InfluxDB {
 class InfluxDB protected[influxdbclient]
 (httpClient: HttpClient)
 (implicit protected val ec: ExecutionContext)
-  extends Object with UserManagement {
+  extends Object with UserManagement with AutoCloseable {
 
   def selectDatabase(databaseName: String) =
     new Database(databaseName, httpClient)
