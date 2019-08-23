@@ -59,6 +59,12 @@ class DatabaseSuite extends CustomTestSuite with BeforeAndAfter {
     assert(result.series.length == 1)
   }
 
+  test("A point can be written using ToPoint type class") {
+    await(database.write(Metric(123, "tag_value")))
+    val result = await(database.query("SELECT * FROM test_measurement WHERE tag_key='tag_value'"))
+    assert(result.series.length == 1)
+  }
+
   test("A point can be written and read with a precision parameter") {
     val time = 1444760421270l
     await(
