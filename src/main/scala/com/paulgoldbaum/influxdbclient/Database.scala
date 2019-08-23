@@ -2,6 +2,7 @@ package com.paulgoldbaum.influxdbclient
 
 import com.paulgoldbaum.influxdbclient.Parameter.Consistency.Consistency
 import com.paulgoldbaum.influxdbclient.Parameter.Precision.Precision
+import com.paulgoldbaum.influxdbclient.implicits.ToPointSyntax
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,12 +13,12 @@ class Database protected[influxdbclient]
   with RetentionPolicyManagement
   with DatabaseManagement
 {
-  def write(point: Point,
+  def write[A](point: A,
             precision: Precision = null,
             consistency: Consistency = null,
-            retentionPolicy: String = null): Future[Boolean] =
+            retentionPolicy: String = null)(implicit toPoint: ToPoint[A]): Future[Boolean] =
   {
-    executeWrite(point.serialize(), precision, consistency, retentionPolicy)
+    executeWrite(point.toPoint.serialize(), precision, consistency, retentionPolicy)
   }
 
   def bulkWrite(points: Seq[Point],
